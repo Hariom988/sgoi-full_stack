@@ -1,26 +1,35 @@
 @import "tailwindcss";
-
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Brand Colors */
+  --color-primary: #22c55e; /* SOGI brand green */
+  --color-primary-hover: #16a34a; /* Slightly darker for hover states */
+
+  /* Surface Colors */
+  --color-bg-dark: #0a0a0a; /* Hero / dark section background */
+  --color-bg-dark-alt: #0d0d0d; /* Trust bar / slightly elevated dark surface */
+
+  /* Text on Dark */
+  --color-text-muted: #d1d5db; /* Gray-300 — body text on dark bg */
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+@theme {
+  --color-primary: var(--color-primary);
+  --color-primary-hover: var(--color-primary-hover);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  padding: 0;
 }
