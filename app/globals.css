@@ -1,7 +1,7 @@
 @import "tailwindcss";
 :root {
   /* Brand Colors */
-  --color-primary: #22c55e; /* SOGI brand green */
+  --color-primary: #46ab3e; /* SOGI brand green */
   --color-primary-hover: #16a34a; /* Slightly darker for hover states */
 
   /* Surface Colors */
