@@ -5,7 +5,6 @@ import FeatureSection from "@/components/(homePage)/featureSection";
 export default function HomePage() {
   return (
     <>
-      <Navbar />
       <HeroSection />
       <FeatureSection />
     </>

@@ -10,6 +10,7 @@
 
   /* Text on Dark */
   --color-text-muted: #d1d5db; /* Gray-300 — body text on dark bg */
+  --color-footer-text: #afbda3;
 }
 
 @theme {
