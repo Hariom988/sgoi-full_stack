@@ -37,10 +37,10 @@ const FOOTER_COLUMNS: FooterColumn[] = [
   {
     heading: "Company",
     links: [
-      { label: "About", href: "/" },
-      { label: "Contact Us", href: "/" },
-      { label: "Privacy Policy", href: "/" },
-      { label: "Term & Conditions", href: "/" },
+      { label: "About", href: "/aboutus" },
+      { label: "Contact Us", href: "/aboutus#contact" },
+      { label: "Privacy Policy", href: "/privacy-policy" },
+      { label: "Term & Conditions", href: "/terms-conditions" },
     ],
   },
 ];
