@@ -80,7 +80,7 @@ export default function Navbar() {
           aria-label="SOGI Pvt Ltd - Home"
         >
           <span className="text-2xl font-extrabold text-primary tracking-tight">
-            SOGI
+            SGOI
           </span>
           <span className="text-[11px] font-medium text-gray-500 tracking-wide -mt-0.5">
             Pvt Ltd.

@@ -72,7 +72,7 @@ function FooterBrand() {
           className="text-4xl font-black tracking-tight leading-none"
           style={{ color: "var(--color-primary)" }}
         >
-          SOGI
+          SGOI
         </span>
         <p className="text-white font-semibold text-base mt-0.5">Pvt Ltd.</p>
       </div>
