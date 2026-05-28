@@ -1,7 +1,7 @@
 import type { PageHeroProps } from "@/components/pageHero";
 import AboutImage    from "@/public/(homePage)/hero.png";
 import PrivacyImage  from "@/public/(heroPages)/privacy.png";
-import TermsImage    from "@/public/(homePage)/hero.png"
+import TermsImage    from "@/public/(heroPages)/terms.png"
 
 export const PAGE_HERO_CONFIG = {
   about: {
