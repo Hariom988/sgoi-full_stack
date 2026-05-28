@@ -88,7 +88,7 @@ export default function PrivacyPolicyPage() {
   return (
     <main>
       <section className="w-full bg-white" aria-label="Privacy policy sections">
-        <div className="mx-auto max-w-full px-4 sm:px-6 lg:px-13 py-10 sm:py-14">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-13 py-10 sm:py-14">
           <ul role="list" className="divide-y divide-gray-200">
             {PRIVACY_POLICY_ITEMS.map((item) => (
               <PolicyRow key={item.title} {...item} />
