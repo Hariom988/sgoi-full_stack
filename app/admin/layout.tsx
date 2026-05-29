@@ -8,18 +8,13 @@ const geistSans = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "Admin — SGOI Pvt Ltd",
+  title: "Admin | SGOI Pvt Ltd",
   description: "Admin panel",
   robots: {
-    index: false, // Tell search engines not to index admin pages
+    index: false,
     follow: false,
   },
 };
-
-/**
- * Admin layout is fully isolated from the public layout.
- * No public Navbar or Footer is rendered here.
- */
 export default function AdminLayout({
   children,
 }: {
