@@ -31,36 +31,36 @@ async function main() {
   const uri = process.env.MONGODB_URI;
 
   if (!uri) {
-    console.error("\n❌  MONGODB_URI is not set. Add it to .env.local and try again.\n");
+    console.error("\nMONGODB_URI is not set. Add it to .env.local and try again.\n");
     process.exit(1);
   }
 
-  console.log("\n🔐  SGOI Admin Account Setup\n");
+  console.log("\n  SGOI Admin Account Setup\n");
 
   const email = await prompt("Admin email: ");
   const password = await prompt("Admin password (min 12 chars): ");
 
   if (!email.trim() || !password) {
-    console.error("\n❌  Email and password are required.\n");
+    console.error("\n  Email and password are required.\n");
     process.exit(1);
   }
 
   if (password.length < 12) {
-    console.error("\n❌  Password must be at least 12 characters.\n");
+    console.error("\n  Password must be at least 12 characters.\n");
     process.exit(1);
   }
 
-  console.log("\n⏳  Connecting to MongoDB…");
+  console.log("\n  Connecting to MongoDB…");
   await mongoose.connect(uri);
 
   const existing = await Admin.findOne({ email: email.trim().toLowerCase() });
   if (existing) {
-    console.error("\n❌  An admin with this email already exists.\n");
+    console.error("\n  An admin with this email already exists.\n");
     await mongoose.disconnect();
     process.exit(1);
   }
 
-  console.log("⏳  Hashing password (this takes a moment)…");
+  console.log("\n  Hashing password (this takes a moment)…");
   const passwordHash = await bcrypt.hash(password, 12);
 
   await Admin.create({
@@ -68,7 +68,7 @@ async function main() {
     passwordHash,
   });
 
-  console.log("\n✅  Admin account created successfully.");
+  console.log("\n  Admin account created successfully.");
   console.log(`   Email: ${email.trim().toLowerCase()}`);
   console.log("\n   Keep your credentials safe. Do not share them.\n");
 
@@ -77,6 +77,6 @@ async function main() {
 }
 
 main().catch((err) => {
-  console.error("\n❌  Seed failed:", err);
+  console.error("\n  Seed failed:", err);
   process.exit(1);
 });

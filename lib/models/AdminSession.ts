@@ -32,7 +32,6 @@ const AdminSessionSchema = new Schema<IAdminSession>(
     expiresAt: {
       type: Date,
       required: true,
-      // MongoDB TTL index: automatically deletes documents after expiresAt
       index: { expires: 0 },
     },
     userAgent: {

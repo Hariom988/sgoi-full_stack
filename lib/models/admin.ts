@@ -26,7 +26,6 @@ const AdminSchema = new Schema<IAdmin>(
   },
 );
 
-// Prevent model re-registration during hot reload in dev
 const Admin: Model<IAdmin> =
   mongoose.models.Admin ?? mongoose.model<IAdmin>("Admin", AdminSchema);
 
