@@ -97,16 +97,10 @@ export default function AdminLoginPage() {
         {/* Card */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
           {/* Header */}
-          <div className="bg-[var(--color-bg-dark)] px-8 py-8 text-center">
-            <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-white/10 mb-4">
-              <ShieldCheck size={28} className="text-[var(--color-primary)]" />
-            </div>
+          <div className="bg-[var(--color-primary)] px-8 py-8 text-center">
             <h1 className="text-2xl font-bold text-white tracking-tight">
               SGOI Admin
             </h1>
-            <p className="text-gray-400 text-sm mt-1">
-              Restricted access — authorized personnel only
-            </p>
           </div>
 
           {/* Form */}
