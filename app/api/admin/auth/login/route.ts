@@ -23,7 +23,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         { status: 403 },
       );
     }
-
+         
     // ── 2. Parse and validate request body 
     let body: unknown;
     try {
@@ -92,7 +92,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       ...cookieOptions,
       value: jwt,
     });
-
     return response;
   } catch (err) {
     console.error("[Admin Login Error]", err);
