@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Eye, EyeOff, Lock, Mail, ShieldCheck } from "lucide-react";
 
@@ -37,7 +37,13 @@ export default function AdminLoginPage() {
     }
   }, []);
 
+  // Prevents React Strict Mode's double-invocation of effects in development
+  // from firing this fetch twice on a single mount.
+  const hasFetchedCsrf = useRef(false);
+
   useEffect(() => {
+    if (hasFetchedCsrf.current) return;
+    hasFetchedCsrf.current = true;
     loadCsrf();
   }, [loadCsrf]);
 

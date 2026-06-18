@@ -59,7 +59,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     );
 
     if (!admin) {
-      // Still run bcrypt to prevent timing-based email enumeration
       await verifyPassword(password, "$2b$12$invalidhashpaddingtopreventimenumeration00000000000000000");
       return NextResponse.json(
         { error: INVALID_CREDENTIALS_MSG },

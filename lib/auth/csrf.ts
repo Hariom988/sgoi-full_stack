@@ -12,6 +12,15 @@ export function generateCsrfToken(): string {
 }
 
 /**
+ * Checks that a token looks like one we actually issued (right length/charset).
+ * Used to decide whether an existing cookie value is safe to re-issue as-is,
+ * rather than blindly trusting any client-supplied value.
+ */
+export function isValidCsrfToken(token: string | undefined): token is string {
+  return !!token && new RegExp(`^[a-f0-9]{${TOKEN_BYTE_LENGTH * 2}}$`).test(token);
+}
+
+/**
  * Returns the cookie name used for CSRF tokens.
  * The frontend reads this cookie (it is NOT HttpOnly) and
  * re-sends the value in the x-csrf-token request header.
