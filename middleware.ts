@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { jwtVerify } from "jose";
 
-// Inlined to avoid importing session.ts (which uses Node.js crypto/mongoose — not edge-compatible)
 const SESSION_COOKIE_NAME = "admin_session";
 
 function getJwtSecret(): Uint8Array {
@@ -16,8 +15,9 @@ export async function middleware(request: NextRequest) {
   const isLoginPage = pathname === "/admin/login";
   const isCsrfEndpoint = pathname === "/api/admin/auth/csrf";
   const isLoginEndpoint = pathname === "/api/admin/auth/login";
+  const isLogoutEndpoint = pathname === "/api/admin/auth/logout"; 
 
-  if (isCsrfEndpoint || isLoginEndpoint) {
+  if (isCsrfEndpoint || isLoginEndpoint || isLogoutEndpoint) { 
     return NextResponse.next();
   }
 

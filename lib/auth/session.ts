@@ -144,7 +144,7 @@ export function sessionCookieOptions(maxAgeSeconds = 7200) {
     httpOnly: true,           // Not accessible via JS
     secure: process.env.NODE_ENV === "production", // HTTPS only in prod
     sameSite: "strict" as const, // No cross-site sending
-    path: "/admin",           // Only sent on /admin routes
+    path: "/",           // Only sent on /admin routes
     maxAge: maxAgeSeconds,
   };
 }

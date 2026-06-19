@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
 
 function getCsrfTokenFromCookie(): string | null {
@@ -14,14 +13,11 @@ function getCsrfTokenFromCookie(): string | null {
 }
 
 export default function LogoutButton() {
-  const router = useRouter();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   async function handleLogout() {
     setIsLoggingOut(true);
-
     try {
-      // Fetch a fresh CSRF token first (the cookie may have expired)
       const csrfRes = await fetch("/api/admin/auth/csrf");
       const csrfData = await csrfRes.json();
       const csrfToken: string =
@@ -34,14 +30,12 @@ export default function LogoutButton() {
           "x-csrf-token": csrfToken,
         },
       });
-
-      router.push("/admin/login");
-      router.refresh();
     } catch {
-      // Even if the request fails, redirect to login
-      router.push("/admin/login");
+      // swallow — still redirect regardless
     } finally {
-      setIsLoggingOut(false);
+      // Full page redirect: guarantees browser re-reads cookie store,
+      // no race between router.push and router.refresh.
+      window.location.href = "/admin/login";
     }
   }
 

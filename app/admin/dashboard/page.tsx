@@ -7,12 +7,6 @@ import {
 import LogoutButton from "../logoutButton";
 import { ShieldCheck } from "lucide-react";
 
-/**
- * Admin Dashboard — Server Component
- *
- * Performs the full DB-level session validation (not just JWT check).
- * If the session is invalid or expired, redirects to login.
- */
 export default async function AdminDashboardPage() {
   // Full server-side session validation
   const cookieStore = await cookies();
