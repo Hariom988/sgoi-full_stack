@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -9,13 +10,14 @@ import {
   ClipboardList,
   Settings,
   X,
+  PanelLeftClose,
+  PanelLeftOpen,
   type LucideIcon,
 } from "lucide-react";
 import { SIDEBAR_ITEMS, type SidebarItem } from "@/lib/admin/sidebarConfig";
+import { SIDEBAR_WIDTH } from "@/lib/admin/sidebarLayoutConfig";
 
 // ─── Icon registry ─────────────────────────────────────────────────────────────
-// Maps string names from sidebarConfig to actual Lucide components.
-// Add new icons here when extending the sidebar config.
 
 const ICON_MAP: Record<string, LucideIcon> = {
   LayoutDashboard,
@@ -25,120 +27,288 @@ const ICON_MAP: Record<string, LucideIcon> = {
   Settings,
 };
 
+// ─── Fixed-position tooltip ────────────────────────────────────────────────────
+// Uses viewport-fixed positioning so it is never clipped by the sidebar's
+// overflow:hidden. Coordinates are captured from getBoundingClientRect on hover.
+
+interface TooltipState {
+  label: string;
+  y: number; // vertical midpoint of the hovered element in viewport px
+}
+
+function FloatingTooltip({ tooltip }: { tooltip: TooltipState | null }) {
+  if (!tooltip) return null;
+
+  return (
+    <div
+      role="tooltip"
+      style={{
+        position: "fixed",
+        left: `calc(${SIDEBAR_WIDTH.collapsed} + 10px)`,
+        top: tooltip.y,
+        transform: "translateY(-50%)",
+        zIndex: 9999,
+        pointerEvents: "none",
+      }}
+      className="flex items-center"
+    >
+      {/* Left-pointing arrow */}
+      <span
+        className="border-[5px] border-transparent border-r-gray-800"
+        aria-hidden="true"
+      />
+      <span className="whitespace-nowrap rounded-md bg-gray-800 px-3 py-1.5 text-xs font-semibold text-white shadow-xl">
+        {tooltip.label}
+      </span>
+    </div>
+  );
+}
+
 // ─── Single nav item ───────────────────────────────────────────────────────────
 
 function SidebarNavItem({
   item,
   isActive,
+  collapsed,
   onClick,
+  onTooltipShow,
+  onTooltipHide,
 }: {
   item: SidebarItem;
   isActive: boolean;
+  collapsed: boolean;
   onClick?: () => void;
+  onTooltipShow: (label: string, y: number) => void;
+  onTooltipHide: () => void;
 }) {
   const Icon = ICON_MAP[item.icon] ?? Package;
+  const linkRef = useRef<HTMLAnchorElement>(null);
+
+  function handleMouseEnter() {
+    if (!collapsed) return;
+    const rect = linkRef.current?.getBoundingClientRect();
+    if (rect) onTooltipShow(item.label, rect.top + rect.height / 2);
+  }
 
   return (
     <li>
       <Link
+        ref={linkRef}
         href={item.href}
         onClick={onClick}
-        className={`
-          flex items-center gap-3 px-3 py-2.5 rounded-lg
-          text-sm font-medium transition-colors duration-150
-          focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]
-          ${
-            isActive
-              ? "bg-[var(--color-primary)]/10 text-[var(--color-primary)]"
-              : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-          }
-        `}
+        aria-label={collapsed ? item.label : undefined}
         aria-current={isActive ? "page" : undefined}
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={onTooltipHide}
+        onFocus={handleMouseEnter}
+        onBlur={onTooltipHide}
+        className={[
+          "flex items-center rounded-lg text-sm font-medium",
+          "transition-colors duration-150",
+          "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]",
+          collapsed
+            ? "justify-center w-10 h-10 mx-auto"
+            : "gap-3 px-3 py-2.5 w-full",
+          isActive
+            ? "bg-[var(--color-primary)]/10 text-[var(--color-primary)]"
+            : "text-gray-600 hover:bg-gray-100 hover:text-gray-900",
+        ].join(" ")}
       >
         <Icon
           size={18}
           strokeWidth={isActive ? 2.5 : 1.75}
-          className={isActive ? "text-[var(--color-primary)]" : "text-gray-400"}
+          className={`shrink-0 ${isActive ? "text-[var(--color-primary)]" : "text-gray-400"}`}
           aria-hidden="true"
         />
-        <span>{item.label}</span>
+        {/* Label removed from DOM entirely when collapsed — not just hidden */}
+        {!collapsed && <span className="truncate">{item.label}</span>}
       </Link>
     </li>
   );
 }
 
-// ─── Sidebar inner content (shared between desktop + drawer) ───────────────────
+// ─── Toggle button ─────────────────────────────────────────────────────────────
+
+function ToggleButton({
+  collapsed,
+  onToggle,
+  onTooltipShow,
+  onTooltipHide,
+}: {
+  collapsed: boolean;
+  onToggle: () => void;
+  onTooltipShow: (label: string, y: number) => void;
+  onTooltipHide: () => void;
+}) {
+  const btnRef = useRef<HTMLButtonElement>(null);
+  const label = collapsed ? "Expand sidebar" : "Collapse sidebar";
+
+  function handleMouseEnter() {
+    if (!collapsed) return;
+    const rect = btnRef.current?.getBoundingClientRect();
+    if (rect) onTooltipShow(label, rect.top + rect.height / 2);
+  }
+
+  return (
+    <button
+      ref={btnRef}
+      onClick={onToggle}
+      aria-label={label}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={onTooltipHide}
+      onFocus={handleMouseEnter}
+      onBlur={onTooltipHide}
+      className="
+        w-8 h-8 rounded-lg flex items-center justify-center
+        text-gray-400 hover:text-gray-700 hover:bg-gray-100
+        transition-colors duration-150
+        cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-primary)]
+      "
+    >
+      {collapsed ? <PanelLeftOpen size={16} /> : <PanelLeftClose size={16} />}
+    </button>
+  );
+}
+
+// ─── Sidebar content (shared between desktop + drawer) ────────────────────────
 
 function SidebarContent({
   pathname,
+  collapsed,
+  onToggleCollapsed,
   onNavClick,
 }: {
   pathname: string;
+  collapsed: boolean;
+  onToggleCollapsed?: () => void;
   onNavClick?: () => void;
 }) {
+  const [tooltip, setTooltip] = useState<TooltipState | null>(null);
+
+  const showTooltip = useCallback((label: string, y: number) => {
+    setTooltip({ label, y });
+  }, []);
+
+  const hideTooltip = useCallback(() => {
+    setTooltip(null);
+  }, []);
+
   return (
-    <div className="flex flex-col h-full">
-      {/* Brand */}
-      <div className="px-4 py-5 border-b border-gray-100">
-        <Link
-          href="/admin/dashboard"
-          className="flex flex-col leading-none"
-          onClick={onNavClick}
+    <>
+      <FloatingTooltip tooltip={tooltip} />
+
+      <div className="fixed flex flex-col h-full">
+        {!collapsed ? (
+          <div className="px-4 py-5 border-b border-gray-100 shrink-0">
+            <Link
+              href="/admin/dashboard"
+              className="flex flex-col leading-none focus-visible:outline-none"
+              onClick={onNavClick}
+            >
+              <span className="text-2xl font-extrabold text-[var(--color-primary)] tracking-tight">
+                SGOI
+              </span>
+              <span className="text-[11px] font-medium text-gray-400 tracking-wide -mt-0.5">
+                Admin Panel
+              </span>
+            </Link>
+          </div>
+        ) : (
+          <div className="h-14 border-b flex justify-center items-center border-gray-100 shrink-0">
+            <span
+              className={`
+
+          text-xl font-extrabold text-[var(--color-primary)] tracking-tight shrink-0
+          transition-all duration-300
+          `}
+            >
+              SGOI
+            </span>
+          </div>
+        )}
+
+        {/* ── Nav  */}
+        <nav
+          className={`flex-1 overflow-y-auto overflow-x-hidden py-4 ${collapsed ? "px-1.5" : "px-3"}`}
+          aria-label="Admin navigation"
         >
-          <span className="text-2xl font-extrabold text-[var(--color-primary)] tracking-tight">
-            SGOI
-          </span>
-          <span className="text-[11px] font-medium text-gray-400 tracking-wide -mt-0.5">
-            Admin Panel
-          </span>
-        </Link>
+          <ul role="list" className="flex flex-col gap-0.5">
+            {SIDEBAR_ITEMS.map((item) => {
+              const isActive =
+                pathname === item.href ||
+                (item.href !== "/admin/dashboard" &&
+                  pathname.startsWith(item.href));
+
+              return (
+                <SidebarNavItem
+                  key={item.href}
+                  item={item}
+                  isActive={isActive}
+                  collapsed={collapsed}
+                  onClick={onNavClick}
+                  onTooltipShow={showTooltip}
+                  onTooltipHide={hideTooltip}
+                />
+              );
+            })}
+          </ul>
+        </nav>
+
+        {/* ── Toggle button — bottom of sidebar, desktop only ────────────────── */}
+        {onToggleCollapsed && (
+          <div
+            className={`border-t border-gray-100 py-3 shrink-0 ${
+              collapsed ? "px-1.5 flex justify-center" : "px-3 flex justify-end"
+            }`}
+          >
+            <ToggleButton
+              collapsed={collapsed}
+              onToggle={onToggleCollapsed}
+              onTooltipShow={showTooltip}
+              onTooltipHide={hideTooltip}
+            />
+          </div>
+        )}
       </div>
-
-      {/* Nav */}
-      <nav
-        className="flex-1 px-3 py-4 overflow-y-auto"
-        aria-label="Admin navigation"
-      >
-        <ul role="list" className="flex flex-col gap-0.5">
-          {SIDEBAR_ITEMS.map((item) => {
-            // Active if exact match, or if current path starts with item href
-            // (so /admin/products/new still highlights Product)
-            const isActive =
-              pathname === item.href ||
-              (item.href !== "/admin/dashboard" &&
-                pathname.startsWith(item.href));
-
-            return (
-              <SidebarNavItem
-                key={item.href}
-                item={item}
-                isActive={isActive}
-                onClick={onNavClick}
-              />
-            );
-          })}
-        </ul>
-      </nav>
-    </div>
+    </>
   );
 }
 
 // ─── Desktop sidebar ───────────────────────────────────────────────────────────
 
-export function AdminSidebarDesktop() {
+export function AdminSidebarDesktop({
+  collapsed,
+  onToggleCollapsed,
+  hydrated,
+}: {
+  collapsed: boolean;
+  onToggleCollapsed: () => void;
+  hydrated: boolean;
+}) {
   const pathname = usePathname();
 
   return (
     <aside
-      className="hidden lg:flex flex-col w-56 shrink-0 bg-white border-r border-gray-200 min-h-screen"
       aria-label="Sidebar navigation"
+      style={{
+        width: collapsed ? SIDEBAR_WIDTH.collapsed : SIDEBAR_WIDTH.expanded,
+        // Transition is only enabled after hydration to avoid animating
+        // the sidebar on first paint when localStorage restores collapsed state
+        transition: hydrated ? "width 300ms ease-in-out" : "none",
+      }}
+      className="hidden lg:flex flex-col shrink-0 bg-white border-r border-gray-200 min-h-screen overflow-hidden"
     >
-      <SidebarContent pathname={pathname} />
+      <SidebarContent
+        pathname={pathname}
+        collapsed={collapsed}
+        onToggleCollapsed={onToggleCollapsed}
+      />
     </aside>
   );
 }
 
 // ─── Mobile drawer ─────────────────────────────────────────────────────────────
+// Always fully expanded — collapse is a desktop-only concept.
 
 export function AdminSidebarDrawer({
   isOpen,
@@ -153,21 +323,17 @@ export function AdminSidebarDrawer({
 
   return (
     <>
-      {/* Backdrop */}
       <div
         className="fixed inset-0 z-40 bg-black/40 lg:hidden"
         onClick={onClose}
         aria-hidden="true"
       />
-
-      {/* Drawer panel */}
       <aside
         className="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-xl lg:hidden flex flex-col"
         role="dialog"
         aria-modal="true"
         aria-label="Navigation menu"
       >
-        {/* Close button */}
         <button
           onClick={onClose}
           className="absolute top-4 right-4 p-1.5 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
@@ -175,8 +341,11 @@ export function AdminSidebarDrawer({
         >
           <X size={18} />
         </button>
-
-        <SidebarContent pathname={pathname} onNavClick={onClose} />
+        <SidebarContent
+          pathname={pathname}
+          collapsed={false}
+          onNavClick={onClose}
+        />
       </aside>
     </>
   );

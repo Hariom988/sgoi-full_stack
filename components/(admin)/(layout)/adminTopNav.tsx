@@ -7,6 +7,7 @@ import { Menu, Search, Bell, LogOut } from "lucide-react";
 
 interface AdminTopNavProps {
   adminEmail: string;
+  sidebarCollapsed: boolean;
   onMenuToggle: () => void;
 }
 
@@ -47,6 +48,7 @@ async function performLogout() {
 
 export default function AdminTopNav({
   adminEmail,
+  sidebarCollapsed,
   onMenuToggle,
 }: AdminTopNavProps) {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -59,7 +61,7 @@ export default function AdminTopNav({
 
   return (
     <header className="sticky top-0 z-30 bg-white border-b border-gray-200 h-14 flex items-center px-4 sm:px-6 gap-4">
-      {/* Mobile hamburger */}
+      {/* Mobile hamburger — always visible on mobile */}
       <button
         onClick={onMenuToggle}
         className="lg:hidden p-1.5 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors"
@@ -68,13 +70,8 @@ export default function AdminTopNav({
         <Menu size={20} />
       </button>
 
-      {/* Logo — visible only on mobile (desktop shows it in sidebar) */}
-      <span className="lg:hidden text-xl font-extrabold text-[var(--color-primary)] tracking-tight shrink-0">
-        SGOI
-      </span>
-
-      {/* Search bar — center */}
-      <div className="flex-1 max-w-md mx-auto">
+      {/* Search bar — center, fills remaining space */}
+      <div className="flex-1 max-w-md ">
         <div className="relative">
           <Search
             size={15}
@@ -97,7 +94,7 @@ export default function AdminTopNav({
       </div>
 
       {/* Right — bell + user + logout */}
-      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+      <div className="flex items-center ml-auto gap-2 sm:gap-3 shrink-0">
         {/* Bell — visual only */}
         <button
           className="relative p-1.5 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors"
