@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Plus } from "lucide-react";
-import { MOCK_PRODUCTS } from "@/lib/admin/mockProducts";
+import { headers } from "next/headers";
 import type { ProductSummary } from "@/lib/admin/productTypes";
 import ProductGrid from "@/components/(admin)/(productSection)/productGrid";
 
@@ -9,20 +9,35 @@ export const metadata: Metadata = {
   title: "Products",
 };
 
-// TODO: replace with real DB/API fetch
+// ─── Data fetching ───────────────────────────────────────────────────────────
+// Fetches from the real products API. Falls back to an empty list (not mock
+// data) on failure, so the page never silently shows fake products in
+// production — the empty state UI communicates the failure instead.
+
 async function getProducts(): Promise<ProductSummary[]> {
-  // Simulate the shape of a real API response — only summary fields needed for the grid
-  return MOCK_PRODUCTS.map((p) => ({
-    _id: p._id,
-    name: p.name,
-    sku: p.sku,
-    category: p.category,
-    description: p.description,
-    price: p.price,
-    stockQuantity: p.stockQuantity,
-    status: p.status,
-    images: p.images,
-  }));
+  try {
+    // Server components need an absolute URL — derive it from request headers
+    // so this works correctly in both dev and production without hardcoding
+    // a domain.
+    const headersList = await headers();
+    const host = headersList.get("host");
+    const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
+
+    const res = await fetch(`${protocol}://${host}/api/admin/products`, {
+      cache: "no-store", // always fresh — this is an admin inventory list
+    });
+
+    if (!res.ok) {
+      console.error("[ProductsPage] Failed to fetch products:", res.status);
+      return [];
+    }
+
+    const data = await res.json();
+    return data.products ?? [];
+  } catch (err) {
+    console.error("[ProductsPage] Error fetching products:", err);
+    return [];
+  }
 }
 
 export default async function ProductsPage() {

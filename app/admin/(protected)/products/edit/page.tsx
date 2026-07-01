@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { MOCK_PRODUCTS } from "@/lib/admin/mockProducts";
+import { headers } from "next/headers";
 import type { Product } from "@/lib/admin/productTypes";
 import ProductForm from "@/components/(admin)/(formSection)/productForm";
 
@@ -8,10 +8,31 @@ interface EditProductPageProps {
   params: Promise<{ id: string }>;
 }
 
-// TODO: replace with real DB/API fetch
 async function getProduct(id: string): Promise<Product | null> {
-  return MOCK_PRODUCTS.find((p) => p._id === id) ?? null;
+  try {
+    const headersList = await headers();
+    const host = headersList.get("host");
+    const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
+
+    const res = await fetch(`${protocol}://${host}/api/admin/products/${id}`, {
+      cache: "no-store",
+    });
+
+    if (res.status === 404) return null;
+    if (!res.ok) {
+      console.error("[EditProductPage] Failed to fetch product:", res.status);
+      return null;
+    }
+
+    const data = await res.json();
+    return data.product ?? null;
+  } catch (err) {
+    console.error("[EditProductPage] Error fetching product:", err);
+    return null;
+  }
 }
+
+// ─── Metadata
 
 export async function generateMetadata({
   params,
@@ -22,6 +43,8 @@ export async function generateMetadata({
     title: product ? `Edit ${product.name}` : "Product Not Found",
   };
 }
+
+// ─── Page
 
 export default async function EditProductPage({
   params,

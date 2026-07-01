@@ -1,27 +1,22 @@
 import Link from "next/link";
 import Image from "next/image";
-import {
-  ArrowLeft,
-  Pencil,
-  Package,
-  TrendingUp,
-  Box,
-  IndianRupee,
-  Calendar,
-} from "lucide-react";
+import { ArrowLeft, Pencil, Package, Box, Calendar } from "lucide-react";
 import type { Product } from "@/lib/admin/productTypes";
+import formatPrice from "@/lib/admin/productTypes";
 import {
-  formatPrice,
   getMarginPercent,
   isInStock,
   isLowStock,
 } from "@/lib/admin/productTypes";
+import isLowStock from "@/lib/admin/productTypes";
 import { getCategoryLabel } from "@/lib/admin/productCategories";
 import AdminBreadcrumb from "@/components/(admin)/(shared)/adminBreadcrumb";
 
 interface ProductViewDetailProps {
   product: Product;
 }
+
+// ─── Stat card (only real, derivable data — no placeholder metrics) ───────────
 
 function StatCard({
   icon: Icon,
@@ -52,7 +47,7 @@ function StatCard({
             {value}
           </p>
           {sub && (
-            <p className="text-xs text-green-600 font-medium mt-0.5">{sub}</p>
+            <p className="text-xs text-gray-400 font-medium mt-0.5">{sub}</p>
           )}
         </div>
       </div>
@@ -76,6 +71,8 @@ export default function ProductViewDetail({ product }: ProductViewDetailProps) {
   const lowStock = isLowStock(product);
   const margin = getMarginPercent(product);
 
+  // Stock bar scaled against this product's own lowStockThreshold — not a
+  // fixed global number. 3x threshold = visually "full" bar.
   const stockPercent = product.lowStockThreshold
     ? Math.min(
         100,
@@ -144,16 +141,8 @@ export default function ProductViewDetail({ product }: ProductViewDetailProps) {
         </Link>
       </div>
 
-      {/* Stat cards row */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-6">
-        <StatCard
-          icon={TrendingUp}
-          label="Total Sales"
-          value="—"
-          sub="No data yet"
-          iconColor="text-emerald-500"
-          iconBg="bg-emerald-50"
-        />
+      {/* Stat cards row — only real, derivable data */}
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 mb-6 max-w-md">
         <StatCard
           icon={Box}
           label="Stock Level"
@@ -163,14 +152,6 @@ export default function ProductViewDetail({ product }: ProductViewDetailProps) {
           iconBg="bg-blue-50"
         />
         <StatCard
-          icon={IndianRupee}
-          label="Revenue"
-          value="—"
-          sub="No data yet"
-          iconColor="text-violet-500"
-          iconBg="bg-violet-50"
-        />
-        <StatCard
           icon={Calendar}
           label="Last Updated"
           value={new Date(product.updatedAt).toLocaleDateString("en-IN", {
@@ -178,7 +159,14 @@ export default function ProductViewDetail({ product }: ProductViewDetailProps) {
             month: "short",
             year: "numeric",
           })}
-          sub={`Created ${new Date(product.createdAt).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" })}`}
+          sub={`Created ${new Date(product.createdAt).toLocaleDateString(
+            "en-IN",
+            {
+              day: "2-digit",
+              month: "short",
+              year: "numeric",
+            },
+          )}`}
           iconColor="text-rose-500"
           iconBg="bg-rose-50"
         />
@@ -429,7 +417,7 @@ export default function ProductViewDetail({ product }: ProductViewDetailProps) {
                   {product.lowStockThreshold} units
                 </span>
               </div>
-              {/* Stock level bar */}
+              {/* Stock level bar — driven by this product's own lowStockThreshold */}
               <div className="pt-2">
                 <div className="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
                   <div

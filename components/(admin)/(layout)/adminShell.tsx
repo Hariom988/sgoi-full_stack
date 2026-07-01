@@ -1,67 +1,48 @@
 "use client";
 
-import { useState, useEffect } from "react";
+// components/(admin)/(layout)/adminShell.tsx
+
+import { useState } from "react";
 import { AdminSidebarDesktop, AdminSidebarDrawer } from "./adminSidebar";
 import AdminTopNav from "./adminTopNav";
+import { useSidebar } from "@/lib/context/sidebarContext";
 
-const COLLAPSED_STORAGE_KEY = "admin_sidebar_collapsed";
+// ─── Props ─────────────────────────────────────────────────────────────────────
 
 interface AdminShellProps {
   adminEmail: string;
   children: React.ReactNode;
 }
 
+// ─── Component ─────────────────────────────────────────────────────────────────
+
 export default function AdminShell({ adminEmail, children }: AdminShellProps) {
+  // All collapse state + localStorage persistence now lives in SidebarContext.
+  // AdminShell is only responsible for the mobile drawer (local UI state only).
+  const { isCollapsed, hydrated, toggle } = useSidebar();
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [collapsed, setCollapsed] = useState(false);
-  // Suppresses the width transition on first paint until localStorage is read,
-  // preventing a visible expand→collapse jump on hydration.
-  const [hydrated, setHydrated] = useState(false);
-
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem(COLLAPSED_STORAGE_KEY);
-      if (stored === "true") setCollapsed(true);
-    } catch {
-      // localStorage unavailable — silently ignore
-    }
-    setHydrated(true);
-  }, []);
-
-  function handleToggleCollapsed() {
-    setCollapsed((prev) => {
-      const next = !prev;
-      try {
-        localStorage.setItem(COLLAPSED_STORAGE_KEY, String(next));
-      } catch {
-        // ignore
-      }
-      return next;
-    });
-  }
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      {/* Desktop sidebar — width controlled by config via inline style */}
+      {/* Desktop sidebar — collapses/expands via context toggle */}
       <AdminSidebarDesktop
-        collapsed={collapsed}
-        onToggleCollapsed={handleToggleCollapsed}
+        collapsed={isCollapsed}
+        onToggleCollapsed={toggle}
         hydrated={hydrated}
       />
 
-      {/* Mobile drawer — always full width, unaffected by collapse state */}
+      {/* Mobile drawer — always fully expanded, separate from collapse state */}
       <AdminSidebarDrawer
         isOpen={drawerOpen}
         onClose={() => setDrawerOpen(false)}
       />
 
-      {/* Content area — flex-1 fills the remaining viewport width automatically.
-          No manual margin/padding offsets needed; the sidebar's inline width
-          drives the flex layout directly. */}
+      {/* Content area — flex-1 fills remaining width automatically.
+          The sidebar's inline width drives the layout; no manual offsets needed. */}
       <div className="flex flex-col flex-1 min-w-0">
         <AdminTopNav
           adminEmail={adminEmail}
-          sidebarCollapsed={collapsed}
+          sidebarCollapsed={isCollapsed}
           onMenuToggle={() => setDrawerOpen(true)}
         />
         <main className="flex-1 overflow-y-auto">{children}</main>
