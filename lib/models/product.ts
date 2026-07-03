@@ -1,10 +1,12 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
+import { slugify } from "@/lib/utils/slugify";
 
 export type ProductStatus = "active" | "draft" | "archived";
 
 export interface Product extends Document {
   name: string;
   sku: string;
+  slug: string;
   category: string;
   description: string;
   minPcs: number;
@@ -38,6 +40,13 @@ const ProductSchema = new Schema<Product>(
       uppercase: true,
       trim: true,
       maxlength: 60,
+      index: true,
+    },
+    slug: {
+      type: String,
+      unique: true,
+      trim: true,
+      maxlength: 160,
       index: true,
     },
     category: {
@@ -117,6 +126,30 @@ const ProductSchema = new Schema<Product>(
   },
 );
 ProductSchema.index({ name: "text", sku: "text" });
+
+// ─── Slug generation ─────────────────────────────────────────────────────────
+// Auto-derives a URL-safe slug from the product name whenever it's new or the
+// name changes. Falls back to appending a short suffix on collision so two
+// products with the same name never clash on /products/[slug].
+ProductSchema.pre("save", async function () {
+  if (!this.isModified("name") && this.slug) {
+    return;
+  }
+
+  const base = slugify(this.name) || "product";
+  let candidate = base;
+  let suffix = 1;
+
+  const ProductModel = this.constructor as Model<Product>;
+  while (
+    await ProductModel.exists({ slug: candidate, _id: { $ne: this._id } })
+  ) {
+    suffix += 1;
+    candidate = `${base}-${suffix}`;
+  }
+
+  this.slug = candidate;
+});
 
 const productsConnection = mongoose.connection.useDb("products", {
   useCache: true,
