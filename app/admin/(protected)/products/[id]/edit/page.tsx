@@ -1,14 +1,21 @@
+// app/admin/(protected)/products/[id]/edit/page.tsx
+
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { headers } from "next/headers";
 import type { Product } from "@/lib/admin/productTypes";
-import ProductViewDetail from "@/components/(admin)/(productSection)/productViewDetail";
+import ProductForm from "@/components/(admin)/(formSection)/productForm";
+import AdminBreadcrumb from "@/components/(admin)/(shared)/adminBreadcrumb";
 
-interface ViewProductPageProps {
+interface EditProductPageProps {
   params: Promise<{ id: string }>;
 }
 
 // ─── Data fetching ───────────────────────────────────────────────────────────
+// Same pattern as products/[id]/view/page.tsx — including forwarding the
+// session cookie. A server-side fetch() to our own /api/admin/* routes does
+// NOT carry it automatically, and without it the middleware redirects to
+// /admin/login, which breaks the JSON parse below.
 
 async function getProduct(id: string): Promise<Product | null> {
   try {
@@ -24,20 +31,20 @@ async function getProduct(id: string): Promise<Product | null> {
 
     if (res.status === 404) return null;
     if (!res.ok) {
-      console.error("[ViewProductPage] Failed to fetch product:", res.status);
+      console.error("[EditProductPage] Failed to fetch product:", res.status);
       return null;
     }
 
     const contentType = res.headers.get("content-type") ?? "";
     if (!contentType.includes("application/json")) {
-      console.error("[ViewProductPage] Unexpected response type:", contentType);
+      console.error("[EditProductPage] Unexpected response type:", contentType);
       return null;
     }
 
     const data = await res.json();
     return data.product ?? null;
   } catch (err) {
-    console.error("[ViewProductPage] Error fetching product:", err);
+    console.error("[EditProductPage] Error fetching product:", err);
     return null;
   }
 }
@@ -46,23 +53,35 @@ async function getProduct(id: string): Promise<Product | null> {
 
 export async function generateMetadata({
   params,
-}: ViewProductPageProps): Promise<Metadata> {
+}: EditProductPageProps): Promise<Metadata> {
   const { id } = await params;
   const product = await getProduct(id);
   return {
-    title: product ? `${product.name} — View` : "Product Not Found",
+    title: product ? `${product.name} — Edit` : "Product Not Found",
   };
 }
 
-// ─── Page ──────────────────────────────────────────────────────────────────
+// ─── Page ────────────────────────────────────────────────────────────────────
 
-export default async function ViewProductPage({
+export default async function EditProductPage({
   params,
-}: ViewProductPageProps) {
+}: EditProductPageProps) {
   const { id } = await params;
   const product = await getProduct(id);
 
   if (!product) notFound();
 
-  return <ProductViewDetail product={product} />;
+  return (
+    <div className="flex flex-col gap-6 p-6">
+      <AdminBreadcrumb
+        items={[
+          { label: "Products", href: "/admin/products" },
+          { label: product.name, href: `/admin/products/${id}/view` },
+          { label: "Edit" },
+        ]}
+      />
+
+      <ProductForm mode="edit" productId={id} initialData={product} />
+    </div>
+  );
 }

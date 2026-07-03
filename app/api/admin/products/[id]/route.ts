@@ -3,9 +3,11 @@ import { Types } from "mongoose";
 import { connectDB } from "@/lib/db/mongoose";
 import Product from "@/lib/models/product";
 import type { ProductFormData } from "@/lib/admin/productTypes";
+import { getR2Client, isR2Configured, keyFromPublicUrl, R2_BUCKET_NAME } from "@/lib/r2/client";
+import { DeleteObjectCommand } from "@aws-sdk/client-s3";
 
 interface RouteParams {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string }>;  
 }
 
 // ─── GET /api/admin/products/:id ────────────────────────────────────────────
@@ -86,7 +88,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       id,
       { $set: body },
       { new: true, runValidators: true },
-    ).lean();
+    ).lean(); 
 
     if (!product) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
@@ -113,11 +115,28 @@ export async function DELETE(_request: NextRequest, { params }: RouteParams) {
     }
 
     await connectDB();
-    const deleted = await Product.findByIdAndDelete(id).lean();
 
-    if (!deleted) {
+    const product = await Product.findById(id).lean();
+    if (!product) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
+
+    if (isR2Configured() && product.images?.length) {
+      const client = getR2Client();
+      await Promise.all(
+        product.images.map(async (url) => {
+          const key = keyFromPublicUrl(url);
+          if (!key) return;
+          try {
+            await client.send(new DeleteObjectCommand({ Bucket: R2_BUCKET_NAME, Key: key }));
+          } catch (err) {
+            console.error(`[DELETE /api/admin/products/:id] Failed to delete R2 object ${key}`, err);
+          }
+        }),
+      );
+    }
+
+    await Product.findByIdAndDelete(id);
 
     return NextResponse.json({ success: true }, { status: 200 });
   } catch (err) {

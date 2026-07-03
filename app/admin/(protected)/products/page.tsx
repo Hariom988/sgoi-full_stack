@@ -23,12 +23,29 @@ async function getProducts(): Promise<ProductSummary[]> {
     const host = headersList.get("host");
     const protocol = process.env.NODE_ENV === "production" ? "https" : "http";
 
+    // The middleware guards /api/admin/* by checking the admin_session
+    // cookie. A server-side fetch() does NOT automatically forward the
+    // incoming request's cookies, so without this the internal call looks
+    // unauthenticated, gets redirected to /admin/login, and the JSON parse
+    // below fails on the login page's HTML.
+    const cookie = headersList.get("cookie") ?? "";
+
     const res = await fetch(`${protocol}://${host}/api/admin/products`, {
       cache: "no-store", // always fresh — this is an admin inventory list
+      headers: { cookie },
     });
 
     if (!res.ok) {
       console.error("[ProductsPage] Failed to fetch products:", res.status);
+      return [];
+    }
+
+    // Defensive check: if auth ever redirects again, res.ok can still be
+    // true (200 from the login page) since fetch follows redirects — this
+    // catches that case instead of throwing on JSON.parse.
+    const contentType = res.headers.get("content-type") ?? "";
+    if (!contentType.includes("application/json")) {
+      console.error("[ProductsPage] Unexpected response type:", contentType);
       return [];
     }
 

@@ -17,17 +17,33 @@ interface ProductCardProps {
 export default function ProductCard({ product, onDelete }: ProductCardProps) {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
 
   const inStock = isInStock({ stockQuantity: product.stockQuantity });
   const hasImage = product.images && product.images.length > 0;
 
   async function handleConfirmDelete() {
     setIsDeleting(true);
-    // TODO: replace with real API call — DELETE /api/admin/products/:id
-    await new Promise((r) => setTimeout(r, 600)); // simulate network
-    onDelete(product._id);
-    setIsDeleting(false);
-    setShowDeleteModal(false);
+    setDeleteError(null);
+    try {
+      const res = await fetch(`/api/admin/products/${product._id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error ?? "Failed to delete product");
+      }
+      onDelete(product._id);
+      setShowDeleteModal(false);
+    } catch (err) {
+      setDeleteError(
+        err instanceof Error
+          ? err.message
+          : "Failed to delete product. Try again.",
+      );
+    } finally {
+      setIsDeleting(false);
+    }
   }
 
   return (
@@ -145,8 +161,12 @@ export default function ProductCard({ product, onDelete }: ProductCardProps) {
         isOpen={showDeleteModal}
         productName={product.name}
         isDeleting={isDeleting}
+        error={deleteError}
         onConfirm={handleConfirmDelete}
-        onCancel={() => setShowDeleteModal(false)}
+        onCancel={() => {
+          setShowDeleteModal(false);
+          setDeleteError(null);
+        }}
       />
     </>
   );

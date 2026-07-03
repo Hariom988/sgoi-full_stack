@@ -6,7 +6,11 @@ import { useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { X, Upload, AlertCircle, Loader2 } from "lucide-react";
 import { PRODUCT_CATEGORIES } from "@/lib/admin/productCategories";
-import type { Product, ProductFormData, ProductStatus } from "@/lib/admin/productTypes";
+import type {
+  Product,
+  ProductFormData,
+  ProductStatus,
+} from "@/lib/admin/productTypes";
 
 interface ProductFormProps {
   mode: "create" | "edit";
@@ -43,7 +47,13 @@ const inputCls = `
 
 const labelCls = "block text-xs font-medium text-gray-700 mb-1.5";
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="bg-white rounded-lg border border-gray-200 p-5">
       <h2 className="text-sm font-bold text-gray-900 mb-4">{title}</h2>
@@ -190,7 +200,7 @@ function ImageUpload({ images, onChange, disabled }: ImageUploadProps) {
       }
 
       const newUrls: string[] = data.images.map(
-        (img: { id: string; url: string }) => img.url,
+        (img: { key: string; url: string }) => img.url,
       );
       onChange([...images, ...newUrls]);
     } catch (err) {
@@ -239,7 +249,9 @@ function ImageUpload({ images, onChange, disabled }: ImageUploadProps) {
         <span className="text-sm text-gray-600">
           {uploading ? "Uploading…" : "Click to Upload images"}
         </span>
-        <span className="text-[11px] text-gray-400">PNG, JPG up to 5MB each</span>
+        <span className="text-[11px] text-gray-400">
+          PNG, JPG up to 5MB each
+        </span>
       </button>
 
       {uploadError && (
@@ -315,12 +327,17 @@ function validate(data: ProductFormData): FormErrors {
   if (!data.sku.trim()) errors.sku = "SKU is required";
   if (!data.category) errors.category = "Select a category";
   if (data.price <= 0) errors.price = "Price must be greater than ₹0";
-  if (data.compareAtPrice <= 0) errors.compareAtPrice = "Compare at price is required";
+  if (data.compareAtPrice <= 0)
+    errors.compareAtPrice = "Compare at price is required";
   if (data.stockQuantity < 0) errors.stockQuantity = "Stock cannot be negative";
   return errors;
 }
 
-export default function ProductForm({ mode, productId, initialData }: ProductFormProps) {
+export default function ProductForm({
+  mode,
+  productId,
+  initialData,
+}: ProductFormProps) {
   const router = useRouter();
 
   const [form, setForm] = useState<ProductFormData>(() => {
@@ -366,7 +383,9 @@ export default function ProductForm({ mode, productId, initialData }: ProductFor
     if (Object.keys(errs).length > 0) {
       setErrors(errs);
       const firstKey = Object.keys(errs)[0];
-      document.getElementById(firstKey)?.scrollIntoView({ behavior: "smooth", block: "center" });
+      document
+        .getElementById(firstKey)
+        ?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
 
@@ -391,7 +410,9 @@ export default function ProductForm({ mode, productId, initialData }: ProductFor
         if (data.fields) {
           setErrors(data.fields);
           const firstKey = Object.keys(data.fields)[0];
-          document.getElementById(firstKey)?.scrollIntoView({ behavior: "smooth", block: "center" });
+          document
+            .getElementById(firstKey)
+            ?.scrollIntoView({ behavior: "smooth", block: "center" });
           return;
         }
         throw new Error(data.error ?? "Something went wrong");
@@ -401,7 +422,9 @@ export default function ProductForm({ mode, productId, initialData }: ProductFor
       router.refresh();
     } catch (err) {
       setServerError(
-        err instanceof Error ? err.message : "Something went wrong. Please try again.",
+        err instanceof Error
+          ? err.message
+          : "Something went wrong. Please try again.",
       );
     } finally {
       setSubmitting(false);
@@ -449,7 +472,12 @@ export default function ProductForm({ mode, productId, initialData }: ProductFor
         {/* Left column */}
         <div className="space-y-5">
           <Section title="Basic Information">
-            <Field label="Product Name" htmlFor="name" required error={errors.name}>
+            <Field
+              label="Product Name"
+              htmlFor="name"
+              required
+              error={errors.name}
+            >
               <input
                 id="name"
                 type="text"
@@ -474,7 +502,12 @@ export default function ProductForm({ mode, productId, initialData }: ProductFor
                 />
               </Field>
 
-              <Field label="Category" htmlFor="category" required error={errors.category}>
+              <Field
+                label="Category"
+                htmlFor="category"
+                required
+                error={errors.category}
+              >
                 <select
                   id="category"
                   value={form.category}
@@ -544,7 +577,12 @@ export default function ProductForm({ mode, productId, initialData }: ProductFor
 
           <Section title="Pricing">
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <Field label="Price" htmlFor="price" required error={errors.price}>
+              <Field
+                label="Price"
+                htmlFor="price"
+                required
+                error={errors.price}
+              >
                 <input
                   id="price"
                   type="number"
@@ -558,7 +596,12 @@ export default function ProductForm({ mode, productId, initialData }: ProductFor
                 />
               </Field>
 
-              <Field label="Compare at Price" htmlFor="compareAtPrice" required error={errors.compareAtPrice}>
+              <Field
+                label="Compare at Price"
+                htmlFor="compareAtPrice"
+                required
+                error={errors.compareAtPrice}
+              >
                 <input
                   id="compareAtPrice"
                   type="number"
@@ -590,7 +633,12 @@ export default function ProductForm({ mode, productId, initialData }: ProductFor
 
           <Section title="Inventory">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Field label="Stock Quantity" htmlFor="stockQuantity" required error={errors.stockQuantity}>
+              <Field
+                label="Stock Quantity"
+                htmlFor="stockQuantity"
+                required
+                error={errors.stockQuantity}
+              >
                 <input
                   id="stockQuantity"
                   type="number"

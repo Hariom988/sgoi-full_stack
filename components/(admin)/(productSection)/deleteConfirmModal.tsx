@@ -7,6 +7,7 @@ interface DeleteConfirmModalProps {
   isOpen: boolean;
   productName: string;
   isDeleting: boolean;
+  error?: string | null;
   onConfirm: () => void;
   onCancel: () => void;
 }
@@ -15,6 +16,7 @@ export default function DeleteConfirmModal({
   isOpen,
   productName,
   isDeleting,
+  error,
   onConfirm,
   onCancel,
 }: DeleteConfirmModalProps) {
@@ -93,6 +95,13 @@ export default function DeleteConfirmModal({
               <X size={16} />
             </button>
           </div>
+          {error && (
+            <div className="px-6 pb-2">
+              <p className="text-xs font-medium text-red-600 bg-red-50 border border-red-100 rounded-lg px-3 py-2">
+                {error}
+              </p>
+            </div>
+          )}
 
           {/* Actions */}
           <div className="flex items-center gap-3 px-6 pb-6 pt-2">
