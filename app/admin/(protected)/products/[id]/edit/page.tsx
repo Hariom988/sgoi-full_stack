@@ -1,5 +1,3 @@
-// app/admin/(protected)/products/[id]/edit/page.tsx
-
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { headers } from "next/headers";
