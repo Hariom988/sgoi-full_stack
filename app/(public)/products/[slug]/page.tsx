@@ -25,7 +25,9 @@ export async function generateMetadata({
   };
 }
 
-export default async function ProductDetailPage({ params }: ProductDetailPageProps) {
+export default async function ProductDetailPage({
+  params,
+}: ProductDetailPageProps) {
   const { slug } = await params;
   const product = await getPublicProductBySlug(slug);
 
@@ -34,7 +36,7 @@ export default async function ProductDetailPage({ params }: ProductDetailPagePro
   }
 
   return (
-    <main className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+    <main className="max-w-screen-xl px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
       <ProductBreadcrumb
         items={[
           { label: "Home", href: "/" },

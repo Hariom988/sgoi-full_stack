@@ -128,6 +128,31 @@ const ProductSchema = new Schema<Product>(
 ProductSchema.index({ name: "text", sku: "text" });
 
 // ─── Slug generation ─────────────────────────────────────────────────────────
+// Derives a URL-safe, collision-free slug from a product name. Exported so
+// both the pre-save hook below AND the admin PATCH route (which updates via
+// findByIdAndUpdate and therefore never runs "save" middleware) can generate
+// a slug for any product that doesn't have one yet.
+export async function generateUniqueProductSlug(
+  name: string,
+  excludeId?: string,
+): Promise<string> {
+  const base = slugify(name) || "product";
+  let candidate = base;
+  let suffix = 1;
+
+  while (
+    await Product.exists({
+      slug: candidate,
+      ...(excludeId ? { _id: { $ne: excludeId } } : {}),
+    })
+  ) {
+    suffix += 1;
+    candidate = `${base}-${suffix}`;
+  }
+
+  return candidate;
+}
+
 // Auto-derives a URL-safe slug from the product name whenever it's new or the
 // name changes. Falls back to appending a short suffix on collision so two
 // products with the same name never clash on /products/[slug].
@@ -136,19 +161,7 @@ ProductSchema.pre("save", async function () {
     return;
   }
 
-  const base = slugify(this.name) || "product";
-  let candidate = base;
-  let suffix = 1;
-
-  const ProductModel = this.constructor as Model<Product>;
-  while (
-    await ProductModel.exists({ slug: candidate, _id: { $ne: this._id } })
-  ) {
-    suffix += 1;
-    candidate = `${base}-${suffix}`;
-  }
-
-  this.slug = candidate;
+  this.slug = await generateUniqueProductSlug(this.name, String(this._id));
 });
 
 const productsConnection = mongoose.connection.useDb("products", {

@@ -11,7 +11,10 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import type { CategoryCount } from "@/lib/public/productService";
-import { buildProductsHref, type ProductsQuery } from "@/lib/public/buildProductsHref";
+import {
+  buildProductsHref,
+  type ProductsQuery,
+} from "@/lib/public/buildProductsHref";
 
 const CATEGORY_ICONS: Record<string, LucideIcon> = {
   "battery-packs": Package,
@@ -47,7 +50,10 @@ export default function CategorySidebar({
           label="All Products"
           count={total}
           isActive={activeCategory === null}
-          href={buildProductsHref(currentQuery, { category: undefined, page: undefined })}
+          href={buildProductsHref(currentQuery, {
+            category: undefined,
+            page: undefined,
+          })}
         />
         {categories.map((cat) => (
           <CategoryRow
@@ -56,7 +62,10 @@ export default function CategorySidebar({
             label={cat.label}
             count={cat.count}
             isActive={activeCategory === cat.value}
-            href={buildProductsHref(currentQuery, { category: cat.value, page: undefined })}
+            href={buildProductsHref(currentQuery, {
+              category: cat.value,
+              page: undefined,
+            })}
           />
         ))}
       </ul>
@@ -72,7 +81,13 @@ interface CategoryRowProps {
   href: string;
 }
 
-function CategoryRow({ icon: Icon, label, count, isActive, href }: CategoryRowProps) {
+function CategoryRow({
+  icon: Icon,
+  label,
+  count,
+  isActive,
+  href,
+}: CategoryRowProps) {
   return (
     <li>
       <Link

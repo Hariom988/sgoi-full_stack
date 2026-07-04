@@ -5,7 +5,8 @@
 // self-fetch hop between the page and its own API.
 
 import { connectDB } from "@/lib/db/mongoose";
-import ProductModel from "@/lib/models/product";
+import { Types } from "mongoose";
+import ProductModel, { generateUniqueProductSlug } from "@/lib/models/product";
 import { PRODUCT_CATEGORIES } from "@/lib/admin/productCategories";
 import type { PublicProduct, PublicProductSummary } from "./productTypes";
 
@@ -81,6 +82,12 @@ export async function getPublicProducts(
     ProductModel.countDocuments(filter),
   ]);
 
+  // Legacy documents created before the `slug` field existed have none, and
+  // findByIdAndUpdate-based edits don't run the slug-generating save hook.
+  // Repair them here, at read time, so a product is never rendered with a
+  // missing slug regardless of whether anyone has edited/re-saved it yet.
+  await backfillMissingSlugs(products);
+
   return {
     products: products.map(toSummary),
     total,
@@ -140,7 +147,7 @@ export async function getCategoryCounts(): Promise<{
 // Minimal shape returned by the .lean() queries above — avoids importing the
 // full Mongoose Document type into the mapping layer.
 interface LeanProduct {
-  _id: unknown;
+  _id: Types.ObjectId;
   name: string;
   slug: string;
   sku: string;
@@ -172,4 +179,20 @@ function toDetail(p: LeanProduct): PublicProduct {
     sku: p.sku,
     minPcs: p.minPcs ?? 1,
   };
+}
+
+// Generates and persists a slug for any product in the batch that doesn't
+// have one, mutating the array in place so the caller's mapping step sees
+// the corrected value immediately (no second query needed, no stale reads).
+async function backfillMissingSlugs(products: LeanProduct[]): Promise<void> {
+  const missing = products.filter((p) => !p.slug);
+  if (missing.length === 0) return;
+
+  await Promise.all(
+    missing.map(async (p) => {
+      const slug = await generateUniqueProductSlug(p.name, String(p._id));
+      await ProductModel.updateOne({ _id: p._id }, { $set: { slug } });
+      p.slug = slug;
+    }),
+  );
 }
