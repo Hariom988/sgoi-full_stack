@@ -49,7 +49,6 @@ export default function ProductCard({ product, onDelete }: ProductCardProps) {
   return (
     <>
       <article className="bg-white rounded-xl border border-gray-200 overflow-hidden flex flex-col hover:shadow-md transition-shadow duration-200">
-        {/* Product image */}
         <div className="relative aspect-[4/3] bg-gray-50 overflow-hidden">
           {hasImage ? (
             <Image
@@ -64,8 +63,6 @@ export default function ProductCard({ product, onDelete }: ProductCardProps) {
               <Package size={40} className="text-gray-200" aria-hidden="true" />
             </div>
           )}
-
-          {/* Status badge */}
           {product.status !== "active" && (
             <span
               className={`
@@ -78,24 +75,19 @@ export default function ProductCard({ product, onDelete }: ProductCardProps) {
           )}
         </div>
 
-        {/* Content */}
         <div className="flex flex-col flex-1 p-4">
-          {/* Category */}
           <p className="text-[11px] font-semibold uppercase tracking-widest text-gray-400 mb-1">
             {getCategoryLabel(product.category)}
           </p>
 
-          {/* Name */}
           <h3 className="text-sm font-bold text-gray-900 leading-snug mb-1 line-clamp-2">
             {product.name}
           </h3>
 
-          {/* Description */}
           <p className="text-xs text-gray-500 leading-relaxed line-clamp-2 mb-3 flex-1">
             {product.description}
           </p>
 
-          {/* Price + stock */}
           <div className="flex items-center justify-between mb-3">
             <span className="text-sm font-bold text-gray-900">
               {formatPrice(product.price)}
@@ -114,7 +106,6 @@ export default function ProductCard({ product, onDelete }: ProductCardProps) {
             </span>
           </div>
 
-          {/* Actions */}
           <div className="flex items-center gap-2 pt-3 border-t border-gray-100">
             <Link
               href={`/admin/products/${product._id}/view`}

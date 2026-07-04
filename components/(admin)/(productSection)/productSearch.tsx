@@ -30,7 +30,6 @@ export default function ProductSearch({
 
   return (
     <div className="flex flex-col sm:flex-row gap-3">
-      {/* Search by name */}
       <div className="relative flex-1">
         <Search
           size={15}
@@ -53,7 +52,6 @@ export default function ProductSearch({
         />
       </div>
 
-      {/* Category dropdown */}
       <div className="relative">
         <button
           onClick={onCategoryToggle}
@@ -78,7 +76,6 @@ export default function ProductSearch({
 
         {categoryOpen && (
           <>
-            {/* Click-outside close */}
             <div
               className="fixed inset-0 z-10"
               onClick={onCategoryClose}
@@ -140,7 +137,6 @@ export default function ProductSearch({
         )}
       </div>
 
-      {/* Filters — visual placeholder */}
       <button
         className="
           flex items-center gap-2 px-4 py-2.5

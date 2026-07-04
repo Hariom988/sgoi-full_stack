@@ -1,10 +1,6 @@
-// Sidebar is driven entirely by this config — no items hardcoded in the component.
-// Add, remove, or reorder menu items here without touching AdminSidebar.tsx.
-
 export interface SidebarItem {
   label: string;
   href: string;
-  // Icon name from lucide-react — rendered dynamically in AdminSidebar
   icon: string;
 }
 

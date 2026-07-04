@@ -1,5 +1,3 @@
-// Fixed category list — replace with DB fetch when categories become dynamic.
-
 export interface ProductCategory {
   value: string;
   label: string;

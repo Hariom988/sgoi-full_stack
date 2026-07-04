@@ -13,7 +13,6 @@ const INVALID_CREDENTIALS_MSG = "Invalid email or password.";
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
-    // ── 1. CSRF validation 
     const cookieCsrf = request.cookies.get(csrfCookieName())?.value;
     const headerCsrf = request.headers.get(csrfHeaderName()) ?? undefined;
 
@@ -24,7 +23,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       );
     }
          
-    // ── 2. Parse and validate request body 
     let body: unknown;
     try {
       body = await request.json();
@@ -52,7 +50,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       );
     }
 
-    // ── 3. Look up admin in DB 
     await connectDB();
     const admin = await Admin.findOne({ email: sanitizedEmail }).select(
       "+passwordHash",
@@ -66,7 +63,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       );
     }
 
-    // ── 4. Verify password 
     const passwordValid = await verifyPassword(password, admin.passwordHash);
 
     if (!passwordValid) {
@@ -76,7 +72,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       );
     }
 
-    // ── 5. Create server-side session 
     const userAgent = request.headers.get("user-agent") ?? "";
     const ipAddress =
       request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
@@ -84,9 +79,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       "unknown";
 
     const jwt = await createSession(admin._id, userAgent, ipAddress);
-
-    // ── 6. Set session cookie and return success 
-    const response = NextResponse.json({ success: true });
+       const response = NextResponse.json({ success: true });
     const cookieOptions = sessionCookieOptions();
     response.cookies.set({
       ...cookieOptions,

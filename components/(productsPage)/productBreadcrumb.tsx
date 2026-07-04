@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export interface BreadcrumbItem {
   label: string;
-  href?: string; // omit for the current page (last item)
+  href?: string;
 }
 
 interface ProductBreadcrumbProps {

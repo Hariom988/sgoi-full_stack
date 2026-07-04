@@ -9,11 +9,8 @@ import {
   keyFromPublicUrl,
 } from "@/lib/r2/client";
 
-// ─── Cloudflare R2 upload route ──────────────────────────────────────────────
-// SECURITY: runs entirely server-side. R2 credentials never reach the client.
-// Returns a clean 503 until R2_* env vars are set.
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_FILE_SIZE = 5 * 1024 * 1024; 
 const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
 
 interface R2UploadResult {
@@ -43,8 +40,6 @@ async function uploadToR2(file: File): Promise<R2UploadResult> {
   return { key, url: `${R2_PUBLIC_URL}/${key}` };
 }
 
-// ─── POST /api/admin/upload ───────────────────────────────────────────────
-// multipart/form-data, files under "files". Returns { images: [{ key, url }] }
 
 export async function POST(request: NextRequest) {
   if (!isR2Configured()) {
@@ -94,9 +89,6 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// ─── DELETE /api/admin/upload?url=... ──────────────────────────────────────
-// Deletes a single image by its public URL. Used for the future edit-image-
-// replacement flow; also gives products/[id]/route.ts a tested code path.
 
 export async function DELETE(request: NextRequest) {
   if (!isR2Configured()) {

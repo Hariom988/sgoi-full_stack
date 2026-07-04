@@ -1,5 +1,3 @@
-// lib/admin/productTypes.ts
-
 export type ProductStatus = "active" | "draft" | "archived";
 
 export interface Product {
@@ -24,16 +22,13 @@ export interface Product {
   updatedAt: string;
 }
 
-// Shape used for the Add / Edit form — _id and timestamps omitted on creation
 export type ProductFormData = Omit<Product, "_id" | "createdAt" | "updatedAt">;
 
-// Lightweight shape used in the product listing grid
 export type ProductSummary = Pick<
   Product,
   "_id" | "name" | "sku" | "category" | "price" | "stockQuantity" | "status" | "images"
 > & { description: string };
 
-// ─── Helpers ──────────────────────────────────────────────────────────────────
 
 export function isLowStock(
   p: Pick<Product, "stockQuantity" | "lowStockThreshold">,

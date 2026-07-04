@@ -11,12 +11,6 @@ interface EditProductPageProps {
   params: Promise<{ id: string }>;
 }
 
-// ─── Data fetching ───────────────────────────────────────────────────────────
-// Same pattern as products/[id]/view/page.tsx — including forwarding the
-// session cookie. A server-side fetch() to our own /api/admin/* routes does
-// NOT carry it automatically, and without it the middleware redirects to
-// /admin/login, which breaks the JSON parse below.
-
 async function getProduct(id: string): Promise<Product | null> {
   try {
     const headersList = await headers();
@@ -49,8 +43,6 @@ async function getProduct(id: string): Promise<Product | null> {
   }
 }
 
-// ─── Metadata ──────────────────────────────────────────────────────────────
-
 export async function generateMetadata({
   params,
 }: EditProductPageProps): Promise<Metadata> {
@@ -60,8 +52,6 @@ export async function generateMetadata({
     title: product ? `${product.name} — Edit` : "Product Not Found",
   };
 }
-
-// ─── Page ────────────────────────────────────────────────────────────────────
 
 export default async function EditProductPage({
   params,

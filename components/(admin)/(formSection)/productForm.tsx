@@ -1,7 +1,4 @@
 "use client";
-
-// components/(admin)/(formSection)/productForm.tsx
-
 import { useState, useCallback, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { X, Upload, AlertCircle, Loader2 } from "lucide-react";
@@ -268,7 +265,6 @@ function ImageUpload({ images, onChange, disabled }: ImageUploadProps) {
               key={url}
               className="relative aspect-square rounded-md border border-gray-200 overflow-hidden bg-gray-50 group"
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={url}
                 alt="Product"
@@ -439,7 +435,6 @@ export default function ProductForm({
       noValidate
       className="px-4 sm:px-6 lg:px-8 py-6 max-w-screen-xl mx-auto"
     >
-      {/* Header */}
       <div className="flex items-center gap-3 mb-6">
         <button
           type="button"
@@ -469,7 +464,6 @@ export default function ProductForm({
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-5">
-        {/* Left column */}
         <div className="space-y-5">
           <Section title="Basic Information">
             <Field
@@ -700,7 +694,6 @@ export default function ProductForm({
           </Section>
         </div>
 
-        {/* Right column */}
         <div className="space-y-5">
           <Section title="Product Images">
             <ImageUpload

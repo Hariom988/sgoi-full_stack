@@ -1,7 +1,5 @@
 "use client";
 
-// components/(admin)/(productSection)/productViewDetail.tsx
-
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -19,8 +17,6 @@ import AdminBreadcrumb from "@/components/(admin)/(shared)/adminBreadcrumb";
 interface ProductViewDetailProps {
   product: Product;
 }
-
-// ─── Stat card ────────────────────────────────────────────────────────────────
 
 function StatCard({
   icon: Icon,
@@ -57,8 +53,6 @@ function StatCard({
   );
 }
 
-// ─── Info row ─────────────────────────────────────────────────────────────────
-
 function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="flex items-start gap-4 py-2 border-b border-gray-50 last:border-0">
@@ -69,8 +63,6 @@ function InfoRow({ label, value }: { label: string; value: React.ReactNode }) {
     </div>
   );
 }
-
-// ─── Main component ───────────────────────────────────────────────────────────
 
 export default function ProductViewDetail({ product }: ProductViewDetailProps) {
   const [activeImage, setActiveImage] = useState(0);
@@ -105,7 +97,6 @@ export default function ProductViewDetail({ product }: ProductViewDetailProps) {
 
   return (
     <div className="px-4 sm:px-6 lg:px-8 py-6 max-w-screen-xl mx-auto">
-      {/* Page header */}
       <div className="flex items-start justify-between gap-4 mb-6">
         <div className="flex items-start gap-3">
           <Link
@@ -139,7 +130,6 @@ export default function ProductViewDetail({ product }: ProductViewDetailProps) {
         </Link>
       </div>
 
-      {/* Stat cards — only real derivable data */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
         <StatCard
           icon={Box}
@@ -166,14 +156,10 @@ export default function ProductViewDetail({ product }: ProductViewDetailProps) {
         />
       </div>
 
-      {/* Main layout — product card left, sidebar right */}
       <div className="flex flex-col lg:flex-row gap-5">
-        {/* ── Product detail card ─────────────────────────────────────────── */}
         <div className="flex-1 min-w-0 bg-white rounded-xl border border-gray-200 overflow-hidden">
           <div className="flex flex-col md:flex-row">
-            {/* Image column */}
             <div className="md:w-80 lg:w-96 shrink-0 border-b md:border-b-0 md:border-r border-gray-100">
-              {/* Main image */}
               <div className="relative bg-gray-50 aspect-square">
                 {currentImage ? (
                   <Image
@@ -191,7 +177,6 @@ export default function ProductViewDetail({ product }: ProductViewDetailProps) {
                 )}
               </div>
 
-              {/* Thumbnail row — interactive, shown when >1 image */}
               {hasImages && product.images.length > 1 && (
                 <div className="flex gap-2 p-3 border-t border-gray-100 flex-wrap">
                   {product.images.slice(0, 4).map((img, i) => (
@@ -224,9 +209,7 @@ export default function ProductViewDetail({ product }: ProductViewDetailProps) {
               )}
             </div>
 
-            {/* Details column */}
             <div className="flex-1 p-6 min-w-0">
-              {/* Product name + stock badge */}
               <div className="flex items-start justify-between gap-3 mb-1">
                 <h2 className="text-lg font-bold text-gray-900 leading-snug">
                   {product.name}
@@ -237,10 +220,8 @@ export default function ProductViewDetail({ product }: ProductViewDetailProps) {
                 {getCategoryLabel(product.category)}
               </p>
 
-              {/* Divider */}
               <div className="border-t border-gray-100 mb-4" />
 
-              {/* Price */}
               <div className="mb-1">
                 <span className="text-2xl font-bold text-gray-900">
                   {formatPrice(product.price)}
@@ -252,7 +233,6 @@ export default function ProductViewDetail({ product }: ProductViewDetailProps) {
                 </p>
               )}
 
-              {/* Info rows */}
               <div className="mt-5">
                 <InfoRow label="SKU" value={product.sku} />
                 <InfoRow
@@ -290,7 +270,6 @@ export default function ProductViewDetail({ product }: ProductViewDetailProps) {
                 />
               </div>
 
-              {/* Description */}
               {product.description && (
                 <div className="mt-5 pt-4 border-t border-gray-100">
                   <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
@@ -302,7 +281,6 @@ export default function ProductViewDetail({ product }: ProductViewDetailProps) {
                 </div>
               )}
 
-              {/* Tags */}
               {product.tags && product.tags.length > 0 && (
                 <div className="mt-4 flex flex-wrap gap-1.5">
                   {product.tags.map((tag) => (
@@ -319,9 +297,7 @@ export default function ProductViewDetail({ product }: ProductViewDetailProps) {
           </div>
         </div>
 
-        {/* ── Right sidebar ────────────────────────────────────────────────── */}
         <div className="lg:w-64 xl:w-72 shrink-0 flex flex-col gap-4">
-          {/* Pricing */}
           <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
             <div className="px-5 py-4 border-b border-gray-100">
               <p className="text-sm font-bold text-gray-900">Pricing</p>
@@ -363,7 +339,6 @@ export default function ProductViewDetail({ product }: ProductViewDetailProps) {
             </div>
           </div>
 
-          {/* Inventory */}
           <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
             <div className="px-5 py-4 border-b border-gray-100">
               <p className="text-sm font-bold text-gray-900">Inventory</p>
@@ -381,8 +356,6 @@ export default function ProductViewDetail({ product }: ProductViewDetailProps) {
                   {product.lowStockThreshold} units
                 </span>
               </div>
-
-              {/* Stock bar */}
               <div className="pt-1">
                 <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
                   <div

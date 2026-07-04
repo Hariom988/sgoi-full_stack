@@ -22,14 +22,12 @@ export default function DeleteConfirmModal({
 }: DeleteConfirmModalProps) {
   const cancelRef = useRef<HTMLButtonElement>(null);
 
-  // Focus cancel button when modal opens
   useEffect(() => {
     if (isOpen) {
       cancelRef.current?.focus();
     }
   }, [isOpen]);
 
-  // Close on Escape
   useEffect(() => {
     if (!isOpen) return;
     function handleKey(e: KeyboardEvent) {
@@ -43,14 +41,12 @@ export default function DeleteConfirmModal({
 
   return (
     <>
-      {/* Backdrop */}
       <div
         className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm"
         onClick={onCancel}
         aria-hidden="true"
       />
 
-      {/* Dialog */}
       <div
         role="alertdialog"
         aria-modal="true"
@@ -59,7 +55,6 @@ export default function DeleteConfirmModal({
         className="fixed inset-0 z-50 flex items-center justify-center p-4"
       >
         <div className="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden">
-          {/* Header */}
           <div className="flex items-start justify-between p-6 pb-4">
             <div className="flex items-start gap-3">
               <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center shrink-0 mt-0.5">
@@ -102,8 +97,6 @@ export default function DeleteConfirmModal({
               </p>
             </div>
           )}
-
-          {/* Actions */}
           <div className="flex items-center gap-3 px-6 pb-6 pt-2">
             <button
               ref={cancelRef}

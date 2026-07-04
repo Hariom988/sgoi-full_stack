@@ -3,17 +3,6 @@ import { getPublicProducts, PRODUCTS_PER_PAGE, type ProductSort } from "@/lib/pu
 
 const VALID_SORTS: ProductSort[] = ["featured", "price-asc", "price-desc", "name-asc"];
 
-// ─── GET /api/products ───────────────────────────────────────────────────────
-// Public, unauthenticated listing endpoint. Only ever returns status:"active"
-// products (enforced inside productService, not here) so admin drafts/archived
-// items never leak to the storefront.
-//
-// Query params:
-//   category  comma-separated category values, e.g. "battery-packs,bms"
-//   search    free-text match against name/description
-//   sort      "featured" | "price-asc" | "price-desc" | "name-asc"
-//   page      1-based page number
-//   limit     page size (defaults to PRODUCTS_PER_PAGE)
 
 export async function GET(request: NextRequest) {
   try {

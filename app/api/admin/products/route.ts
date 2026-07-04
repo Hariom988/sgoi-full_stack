@@ -3,11 +3,6 @@ import { connectDB } from "@/lib/db/mongoose";
 import Product from "@/lib/models/product";
 import type { ProductFormData } from "@/lib/admin/productTypes";
 
-// ─── GET /api/admin/products ────────────────────────────────────────────────
-// Returns the product list for the listing page. Supports optional ?search=
-// and ?category= query params so the existing search/filter UI can eventually
-// move server-side without changing this route's shape.
-
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
@@ -41,10 +36,6 @@ export async function GET(request: NextRequest) {
   }
 }
 
-// ─── POST /api/admin/products ───────────────────────────────────────────────
-// Creates a new product. Expects ProductFormData shape in the request body.
-// Validation here mirrors productForm.tsx client-side validation as a
-// server-side safety net — never trust client validation alone.
 
 export async function POST(request: NextRequest) {
   try {
@@ -52,7 +43,6 @@ export async function POST(request: NextRequest) {
 
     const body: ProductFormData = await request.json();
 
-    // ── Server-side validation (mirrors client-side rules) ──────────────────
     const errors: Record<string, string> = {};
 
     if (!body.name?.trim()) errors.name = "Product name is required";
@@ -69,7 +59,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Validation failed", fields: errors }, { status: 400 });
     }
 
-    // ── Duplicate SKU check ──────────────────────────────────────────────────
     const existing = await Product.findOne({ sku: body.sku.toUpperCase() }).lean();
     if (existing) {
       return NextResponse.json(

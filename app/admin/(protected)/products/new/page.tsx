@@ -1,7 +1,3 @@
-// app/admin/(protected)/products/new/page.tsx
-// This file is already correctly placed — no logic changes needed.
-// Included here for reference completeness only.
-
 import ProductForm from "@/components/(admin)/(formSection)/productForm";
 import AdminBreadcrumb from "@/components/(admin)/(shared)/adminBreadcrumb";
 

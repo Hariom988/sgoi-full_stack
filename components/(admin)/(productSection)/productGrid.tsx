@@ -17,7 +17,6 @@ export default function ProductGrid({ initialProducts }: ProductGridProps) {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [categoryOpen, setCategoryOpen] = useState(false);
 
-  // ── Filter logic ─────────────────────────────────────────────────────────────
   const filtered = useMemo(() => {
     let result = products;
 
@@ -38,15 +37,12 @@ export default function ProductGrid({ initialProducts }: ProductGridProps) {
 
   const isFiltered =
     searchQuery.trim().length > 0 || selectedCategory !== "all";
-
-  // ── Delete handler (passed down to cards) ─────────────────────────────────
   function handleDelete(id: string) {
     setProducts((prev) => prev.filter((p) => p._id !== id));
   }
 
   return (
     <div>
-      {/* ── Toolbar ─────────────────────────────────────────────────────────── */}
       <div className="mb-6">
         <ProductSearch
           searchQuery={searchQuery}
@@ -59,7 +55,6 @@ export default function ProductGrid({ initialProducts }: ProductGridProps) {
         />
       </div>
 
-      {/* ── Results count ────────────────────────────────────────────────────── */}
       {filtered.length > 0 && (
         <p className="text-xs text-gray-400 mb-4">
           Showing {filtered.length} of {products.length} product
@@ -67,7 +62,6 @@ export default function ProductGrid({ initialProducts }: ProductGridProps) {
         </p>
       )}
 
-      {/* ── Grid / Empty state ───────────────────────────────────────────────── */}
       {filtered.length === 0 ? (
         <ProductEmptyState isFiltered={isFiltered} />
       ) : (

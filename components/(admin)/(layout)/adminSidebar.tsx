@@ -17,8 +17,6 @@ import {
 import { SIDEBAR_ITEMS, type SidebarItem } from "@/lib/admin/sidebarConfig";
 import { SIDEBAR_WIDTH } from "@/lib/admin/sidebarLayoutConfig";
 
-// ─── Icon registry ─────────────────────────────────────────────────────────────
-
 const ICON_MAP: Record<string, LucideIcon> = {
   LayoutDashboard,
   Package,
@@ -27,13 +25,9 @@ const ICON_MAP: Record<string, LucideIcon> = {
   Settings,
 };
 
-// ─── Fixed-position tooltip ────────────────────────────────────────────────────
-// Uses viewport-fixed positioning so it is never clipped by the sidebar's
-// overflow:hidden. Coordinates are captured from getBoundingClientRect on hover.
-
 interface TooltipState {
   label: string;
-  y: number; // vertical midpoint of the hovered element in viewport px
+  y: number;
 }
 
 function FloatingTooltip({ tooltip }: { tooltip: TooltipState | null }) {
@@ -52,7 +46,6 @@ function FloatingTooltip({ tooltip }: { tooltip: TooltipState | null }) {
       }}
       className="flex items-center"
     >
-      {/* Left-pointing arrow */}
       <span
         className="border-[5px] border-transparent border-r-gray-800"
         aria-hidden="true"
@@ -63,8 +56,6 @@ function FloatingTooltip({ tooltip }: { tooltip: TooltipState | null }) {
     </div>
   );
 }
-
-// ─── Single nav item ───────────────────────────────────────────────────────────
 
 function SidebarNavItem({
   item,
@@ -120,14 +111,11 @@ function SidebarNavItem({
           className={`shrink-0 ${isActive ? "text-[var(--color-primary)]" : "text-gray-400"}`}
           aria-hidden="true"
         />
-        {/* Label removed from DOM entirely when collapsed — not just hidden */}
         {!collapsed && <span className="truncate">{item.label}</span>}
       </Link>
     </li>
   );
 }
-
-// ─── Toggle button ─────────────────────────────────────────────────────────────
 
 function ToggleButton({
   collapsed,
@@ -169,8 +157,6 @@ function ToggleButton({
     </button>
   );
 }
-
-// ─── Sidebar content (shared between desktop + drawer) ────────────────────────
 
 function SidebarContent({
   pathname,
@@ -227,7 +213,6 @@ function SidebarContent({
           </div>
         )}
 
-        {/* ── Nav  */}
         <nav
           className={`flex-1 overflow-y-auto overflow-x-hidden py-4 ${collapsed ? "px-1.5" : "px-3"}`}
           aria-label="Admin navigation"
@@ -254,7 +239,6 @@ function SidebarContent({
           </ul>
         </nav>
 
-        {/* ── Toggle button — bottom of sidebar, desktop only ────────────────── */}
         {onToggleCollapsed && (
           <div
             className={`border-t border-gray-100 py-3 shrink-0 ${
@@ -274,8 +258,6 @@ function SidebarContent({
   );
 }
 
-// ─── Desktop sidebar ───────────────────────────────────────────────────────────
-
 export function AdminSidebarDesktop({
   collapsed,
   onToggleCollapsed,
@@ -292,8 +274,6 @@ export function AdminSidebarDesktop({
       aria-label="Sidebar navigation"
       style={{
         width: collapsed ? SIDEBAR_WIDTH.collapsed : SIDEBAR_WIDTH.expanded,
-        // Transition is only enabled after hydration to avoid animating
-        // the sidebar on first paint when localStorage restores collapsed state
         transition: hydrated ? "width 300ms ease-in-out" : "none",
       }}
       className="hidden lg:flex flex-col shrink-0 bg-white border-r border-gray-200 min-h-screen overflow-hidden"
@@ -306,9 +286,6 @@ export function AdminSidebarDesktop({
     </aside>
   );
 }
-
-// ─── Mobile drawer ─────────────────────────────────────────────────────────────
-// Always fully expanded — collapse is a desktop-only concept.
 
 export function AdminSidebarDrawer({
   isOpen,

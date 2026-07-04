@@ -31,10 +31,7 @@ export default function LogoutButton() {
         },
       });
     } catch {
-      // swallow — still redirect regardless
     } finally {
-      // Full page redirect: guarantees browser re-reads cookie store,
-      // no race between router.push and router.refresh.
       window.location.href = "/admin/login";
     }
   }

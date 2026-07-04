@@ -10,7 +10,6 @@ interface RouteParams {
   params: Promise<{ id: string }>;  
 }
 
-// ─── GET /api/admin/products/:id ────────────────────────────────────────────
 
 export async function GET(_request: NextRequest, { params }: RouteParams) {
   try {
@@ -37,8 +36,6 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
   }
 }
 
-// ─── PATCH /api/admin/products/:id ──────────────────────────────────────────
-// Updates an existing product. Accepts partial or full ProductFormData.
 
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
   try {
@@ -51,8 +48,6 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     await connectDB();
 
     const body: Partial<ProductFormData> = await request.json();
-
-    // ── Server-side validation on whatever fields were sent ─────────────────
     const errors: Record<string, string> = {};
 
     if (body.name !== undefined && !body.name.trim())
@@ -70,7 +65,6 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
       return NextResponse.json({ error: "Validation failed", fields: errors }, { status: 400 });
     }
 
-    // ── Duplicate SKU check (only if SKU is being changed) ──────────────────
     if (body.sku) {
       const existing = await Product.findOne({
         sku: body.sku.toUpperCase(),
@@ -104,7 +98,6 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
   }
 }
 
-// ─── DELETE /api/admin/products/:id ─────────────────────────────────────────
 
 export async function DELETE(_request: NextRequest, { params }: RouteParams) {
   try {

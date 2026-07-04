@@ -4,13 +4,16 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ChevronDown } from "lucide-react";
 import type { CategoryCount } from "@/lib/public/productService";
-import { buildProductsHref, type ProductsQuery } from "@/lib/public/buildProductsHref";
+import {
+  buildProductsHref,
+  type ProductsQuery,
+} from "@/lib/public/buildProductsHref";
 
 const VISIBLE_COUNT = 5;
 
 interface ProductFilterPanelProps {
   categories: CategoryCount[];
-  selected: string[]; // currently active category values
+  selected: string[];
   currentQuery: ProductsQuery;
 }
 

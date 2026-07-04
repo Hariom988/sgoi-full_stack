@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getPublicProductBySlug } from "@/lib/public/productService";
 
-// ─── GET /api/products/[slug] ────────────────────────────────────────────────
-// Public, unauthenticated detail endpoint. Returns 404 for missing OR
-// non-active (draft/archived) products — the two cases are indistinguishable
-// to a storefront visitor.
 
 export async function GET(
   request: NextRequest,

@@ -1,10 +1,3 @@
-import {
-  Package,
-  BadgeDollarSign,
-  MessageCircle,
-  CreditCard,
-  Truck,
-} from "lucide-react";
 import PaymentIcon from "@/public/(aboutusPage)/payments.svg";
 import QualityIcon from "@/public/(aboutusPage)/quality.svg";
 import ReliableIcon from "@/public/(aboutusPage)/reliable.svg";

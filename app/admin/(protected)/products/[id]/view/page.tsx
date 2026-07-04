@@ -8,8 +8,6 @@ interface ViewProductPageProps {
   params: Promise<{ id: string }>;
 }
 
-// ─── Data fetching ───────────────────────────────────────────────────────────
-
 async function getProduct(id: string): Promise<Product | null> {
   try {
     const headersList = await headers();
@@ -42,8 +40,6 @@ async function getProduct(id: string): Promise<Product | null> {
   }
 }
 
-// ─── Metadata ──────────────────────────────────────────────────────────────
-
 export async function generateMetadata({
   params,
 }: ViewProductPageProps): Promise<Metadata> {
@@ -53,8 +49,6 @@ export async function generateMetadata({
     title: product ? `${product.name} — View` : "Product Not Found",
   };
 }
-
-// ─── Page ──────────────────────────────────────────────────────────────────
 
 export default async function ViewProductPage({
   params,

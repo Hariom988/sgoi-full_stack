@@ -1,8 +1,3 @@
-// lib/public/productService.ts
-// Server-only data access layer for the public storefront. Keeps Mongo query
-// logic in one place so both the /api/products route handlers and the
-// server-rendered /products pages stay in sync and avoid a redundant
-// self-fetch hop between the page and its own API.
 
 import { connectDB } from "@/lib/db/mongoose";
 import { Types } from "mongoose";
@@ -15,7 +10,7 @@ export const PRODUCTS_PER_PAGE = 16;
 export type ProductSort = "featured" | "price-asc" | "price-desc" | "name-asc";
 
 export interface ProductListParams {
-  categories?: string[]; // one or more category values (OR'd together)
+  categories?: string[]; 
   search?: string;
   sort?: ProductSort;
   page?: number;
@@ -47,7 +42,6 @@ function buildSortStage(sort: ProductSort | undefined): Record<string, 1 | -1> {
   }
 }
 
-// ─── List (with filters, sort, pagination) ─────────────────────────────────
 
 export async function getPublicProducts(
   params: ProductListParams,
@@ -81,11 +75,6 @@ export async function getPublicProducts(
       .lean(),
     ProductModel.countDocuments(filter),
   ]);
-
-  // Legacy documents created before the `slug` field existed have none, and
-  // findByIdAndUpdate-based edits don't run the slug-generating save hook.
-  // Repair them here, at read time, so a product is never rendered with a
-  // missing slug regardless of whether anyone has edited/re-saved it yet.
   await backfillMissingSlugs(products);
 
   return {
@@ -97,7 +86,6 @@ export async function getPublicProducts(
   };
 }
 
-// ─── Single product by slug ─────────────────────────────────────────────────
 
 export async function getPublicProductBySlug(
   slug: string,
@@ -109,8 +97,6 @@ export async function getPublicProductBySlug(
 
   return toDetail(product);
 }
-
-// ─── Category counts (for the sidebar) ──────────────────────────────────────
 
 export interface CategoryCount {
   value: string;
@@ -141,11 +127,6 @@ export async function getCategoryCounts(): Promise<{
 
   return { total, categories };
 }
-
-// ─── Mappers ─────────────────────────────────────────────────────────────────
-
-// Minimal shape returned by the .lean() queries above — avoids importing the
-// full Mongoose Document type into the mapping layer.
 interface LeanProduct {
   _id: Types.ObjectId;
   name: string;
@@ -181,9 +162,6 @@ function toDetail(p: LeanProduct): PublicProduct {
   };
 }
 
-// Generates and persists a slug for any product in the batch that doesn't
-// have one, mutating the array in place so the caller's mapping step sees
-// the corrected value immediately (no second query needed, no stale reads).
 async function backfillMissingSlugs(products: LeanProduct[]): Promise<void> {
   const missing = products.filter((p) => !p.slug);
   if (missing.length === 0) return;

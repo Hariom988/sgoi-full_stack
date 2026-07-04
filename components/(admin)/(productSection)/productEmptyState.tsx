@@ -2,7 +2,7 @@ import Link from "next/link";
 import { PackageOpen, Plus } from "lucide-react";
 
 interface ProductEmptyStateProps {
-  isFiltered: boolean; // true = search/filter returned nothing; false = no products at all
+  isFiltered: boolean;
 }
 
 export default function ProductEmptyState({

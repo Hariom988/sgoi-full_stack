@@ -1,21 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
-// ─── Cloudflare Images upload route ─────────────────────────────────────────
-//
-// SECURITY: This route runs entirely server-side. The Cloudflare API token is
-// read from process.env and NEVER sent to or exposed in the client bundle.
-// The client only ever talks to THIS route, never to Cloudflare directly.
-//
-// SETUP REQUIRED (see chat for full step-by-step):
-//   CLOUDFLARE_ACCOUNT_ID            — Cloudflare dashboard → Account ID
-//   CLOUDFLARE_API_TOKEN             — API token with Images:Edit permission
-//   CLOUDFLARE_IMAGES_ACCOUNT_HASH   — used client-side to build delivery URLs
-//
-// Until these are set, this route returns a clear 503 instead of crashing,
-// so the rest of the app (product form, etc.) can be built and tested now,
-// with image upload simply disabled until credentials are added.
-
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB, matches the UI copy "up to 5MB each"
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
 const ALLOWED_TYPES = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
 
 interface CloudflareUploadResult {
@@ -63,16 +48,10 @@ async function uploadToCloudflare(
 
   return {
     id: data.result.id,
-    // "public" is Cloudflare's default variant — created automatically for
-    // every account. Custom named variants can be added later in the
-    // Cloudflare dashboard (Images → Variants) without changing this code.
     url: data.result.variants[0] ?? `${data.result.id}/public`,
   };
 }
 
-// ─── POST /api/admin/upload ─────────────────────────────────────────────────
-// Accepts multipart/form-data with one or more files under the "files" field.
-// Returns { images: [{ id, url }] } on success.
 
 export async function POST(request: NextRequest) {
   const config = getCloudflareConfig();
@@ -96,7 +75,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No files provided" }, { status: 400 });
     }
 
-    // ── Validate every file before uploading any of them ───────────────────
     for (const file of files) {
       if (!ALLOWED_TYPES.includes(file.type)) {
         return NextResponse.json(
@@ -112,9 +90,6 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // ── Upload sequentially to keep error attribution simple. Cloudflare's
-    // per-account rate limits make parallel batches risky for larger sets;
-    // sequential is safer and still fast for typical 1-6 product images. ──
     const results: CloudflareUploadResult[] = [];
     for (const file of files) {
       const result = await uploadToCloudflare(file, config);
@@ -128,10 +103,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
-
-// ─── DELETE /api/admin/upload?id=xxx ────────────────────────────────────────
-// Prepares for future image replacement/deletion (mentioned as a future need).
-// Deletes a single image from Cloudflare by its image ID.
 
 export async function DELETE(request: NextRequest) {
   const config = getCloudflareConfig();

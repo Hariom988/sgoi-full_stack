@@ -127,11 +127,6 @@ const ProductSchema = new Schema<Product>(
 );
 ProductSchema.index({ name: "text", sku: "text" });
 
-// ─── Slug generation ─────────────────────────────────────────────────────────
-// Derives a URL-safe, collision-free slug from a product name. Exported so
-// both the pre-save hook below AND the admin PATCH route (which updates via
-// findByIdAndUpdate and therefore never runs "save" middleware) can generate
-// a slug for any product that doesn't have one yet.
 export async function generateUniqueProductSlug(
   name: string,
   excludeId?: string,
@@ -153,9 +148,6 @@ export async function generateUniqueProductSlug(
   return candidate;
 }
 
-// Auto-derives a URL-safe slug from the product name whenever it's new or the
-// name changes. Falls back to appending a short suffix on collision so two
-// products with the same name never clash on /products/[slug].
 ProductSchema.pre("save", async function () {
   if (!this.isModified("name") && this.slug) {
     return;

@@ -1,8 +1,5 @@
 import { S3Client } from "@aws-sdk/client-s3";
 
-// ─── Cloudflare R2 client (S3-compatible) ───────────────────────────────────
-// Shared across every route that reads/writes R2 objects, so account/endpoint
-// config lives in exactly one place.
 
 const R2_ACCOUNT_ID = process.env.R2_ACCOUNT_ID;
 const R2_ACCESS_KEY_ID = process.env.R2_ACCESS_KEY_ID;
@@ -19,8 +16,6 @@ export function isR2Configured(): boolean {
 
 let cachedClient: S3Client | null = null;
 
-// Lazily constructed so importing this module never throws when env vars
-// aren't set — routes check isR2Configured() first and return a clean 503.
 export function getR2Client(): S3Client {
   if (cachedClient) return cachedClient;
 
@@ -39,13 +34,6 @@ export function getR2Client(): S3Client {
 
   return cachedClient;
 }
-
-/**
- * Given a public R2 URL previously handed to the client
- * (e.g. `${R2_PUBLIC_URL}/products/abc.jpg`), derive the object key
- * (`products/abc.jpg`) needed to delete it.
- * Returns null if the URL doesn't belong to this bucket's public domain.
- */
 export function keyFromPublicUrl(url: string): string | null {
   if (!R2_PUBLIC_URL) return null;
   const base = R2_PUBLIC_URL.endsWith("/") ? R2_PUBLIC_URL : `${R2_PUBLIC_URL}/`;

@@ -73,7 +73,6 @@ if (!session) return null;
 const admin = await Admin.findById(session.adminId).select("email").lean();
 const email = (admin as { email?: string } | null)?.email ?? "admin@sgoi.in";
 
-    // Step 3 — Check inactivity window
     const now = new Date();
     const msSinceLastActivity =
       now.getTime() - session.lastActivityAt.getTime();

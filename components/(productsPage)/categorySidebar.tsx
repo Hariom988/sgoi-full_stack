@@ -29,7 +29,7 @@ const CATEGORY_ICONS: Record<string, LucideIcon> = {
 interface CategorySidebarProps {
   total: number;
   categories: CategoryCount[];
-  activeCategory: string | null; // null = "All Products"
+  activeCategory: string | null;
   currentQuery: ProductsQuery;
 }
 

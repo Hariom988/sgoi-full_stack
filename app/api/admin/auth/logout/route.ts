@@ -27,7 +27,6 @@ function buildClearCookieHeader(path: string, secure: boolean): string {
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
   try {
-    // ── 1. CSRF validation ─────────────────────────────────────────────────────
     const cookieCsrf = request.cookies.get(csrfCookieName())?.value;
     const headerCsrf = request.headers.get(csrfHeaderName()) ?? undefined;
 
@@ -38,7 +37,6 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       );
     }
 
-    // ── 2. Destroy server-side session if JWT is present ──────────────────────
     const sessionJwt = request.cookies.get(SESSION_COOKIE_NAME)?.value;
 
     if (sessionJwt) {
@@ -49,13 +47,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           await destroySession(sessionId);
         }
       } catch {
-        // JWT already invalid — still clear cookies below
       }
     }
-
-    // ── 3. Clear cookie on BOTH paths ─────────────────────────────────────────
-    // Cookies are keyed by name + path. We clear both "/" and "/admin" to handle
-    // cookies issued before and after the path migration, so no stale token survives.
     const secure = process.env.NODE_ENV === "production";
     const response = NextResponse.json({ success: true });
 

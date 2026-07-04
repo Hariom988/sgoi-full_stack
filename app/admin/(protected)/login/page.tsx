@@ -4,16 +4,12 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Eye, EyeOff, Lock, Mail, ShieldCheck } from "lucide-react";
 
-// ─── CSRF helper ──────────────────────────────────────────────────────────────
-
 async function fetchCsrfToken(): Promise<string> {
   const res = await fetch("/api/admin/auth/csrf", { method: "GET" });
   if (!res.ok) throw new Error("Failed to fetch CSRF token.");
   const data = await res.json();
   return data.csrfToken as string;
 }
-
-// ─── Component ────────────────────────────────────────────────────────────────
 
 export default function AdminLoginPage() {
   const router = useRouter();
@@ -27,7 +23,6 @@ export default function AdminLoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Fetch CSRF token on mount
   const loadCsrf = useCallback(async () => {
     try {
       const token = await fetchCsrfToken();
@@ -36,9 +31,6 @@ export default function AdminLoginPage() {
       setError("Failed to initialize security token. Please refresh the page.");
     }
   }, []);
-
-  // Prevents React Strict Mode's double-invocation of effects in development
-  // from firing this fetch twice on a single mount.
   const hasFetchedCsrf = useRef(false);
 
   useEffect(() => {
@@ -46,8 +38,6 @@ export default function AdminLoginPage() {
     hasFetchedCsrf.current = true;
     loadCsrf();
   }, [loadCsrf]);
-
-  // ── Form submission ──────────────────────────────────────────────────────────
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -79,12 +69,11 @@ export default function AdminLoginPage() {
 
       if (!res.ok) {
         setError(data.error ?? "Login failed. Please try again.");
-        // Refresh CSRF token after a failed attempt
+
         await loadCsrf();
         return;
       }
 
-      // Success — redirect to intended destination
       router.push(callbackUrl);
       router.refresh();
     } catch {
@@ -95,24 +84,18 @@ export default function AdminLoginPage() {
     }
   }
 
-  // ── Render ───────────────────────────────────────────────────────────────────
-
   return (
     <main className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
       <div className="w-full max-w-md">
-        {/* Card */}
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
-          {/* Header */}
           <div className="bg-[var(--color-primary)] px-8 py-8 text-center">
             <h1 className="text-2xl font-bold text-white tracking-tight">
               SGOI Admin
             </h1>
           </div>
 
-          {/* Form */}
           <div className="px-8 py-8">
             <form onSubmit={handleSubmit} noValidate className="space-y-5">
-              {/* Error banner */}
               {error && (
                 <div
                   role="alert"
@@ -123,7 +106,6 @@ export default function AdminLoginPage() {
                 </div>
               )}
 
-              {/* Email */}
               <div>
                 <label
                   htmlFor="email"
@@ -158,7 +140,6 @@ export default function AdminLoginPage() {
                 </div>
               </div>
 
-              {/* Password */}
               <div>
                 <label
                   htmlFor="password"
@@ -202,8 +183,6 @@ export default function AdminLoginPage() {
                   </button>
                 </div>
               </div>
-
-              {/* Submit */}
               <button
                 type="submit"
                 disabled={isLoading || !csrfToken}
@@ -223,7 +202,6 @@ export default function AdminLoginPage() {
           </div>
         </div>
 
-        {/* Footer note */}
         <p className="text-center text-xs text-gray-400 mt-6">
           This area is restricted. Unauthorized access attempts may be
           prosecuted.
