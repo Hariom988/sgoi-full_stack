@@ -82,12 +82,32 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 
     const passwordHash = await hashPassword(sanitizedPassword);
 
-    const user = await User.create({
-      name: sanitizedName,
-      email: sanitizedEmail,
-      passwordHash,
-      authProvider: "credentials",
-    });
+    let user;
+    try {
+      user = await User.create({
+        name: sanitizedName,
+        email: sanitizedEmail,
+        passwordHash,
+        authProvider: "credentials",
+      });
+    } catch (createErr) {
+      const isDuplicateKey =
+        typeof createErr === "object" &&
+        createErr !== null &&
+        "code" in createErr &&
+        (createErr as { code?: number }).code === 11000;
+
+      if (isDuplicateKey) {
+        return NextResponse.json(
+          {
+            error: "Validation failed.",
+            fields: { email: "An account with this email already exists." },
+          },
+          { status: 409 },
+        );
+      }
+      throw createErr;
+    }
 
     const userAgent = request.headers.get("user-agent") ?? "";
     const ipAddress =

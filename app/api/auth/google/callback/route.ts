@@ -9,7 +9,8 @@ import {
 } from "@/lib/auth/google";
 
 function redirectWithError(request: NextRequest, error: string): NextResponse {
-  const loginUrl = new URL("/login", request.url);
+  const loginUrl = new URL("/auth", request.url);
+  loginUrl.searchParams.set("mode", "login");
   loginUrl.searchParams.set("error", error);
   return NextResponse.redirect(loginUrl);
 }

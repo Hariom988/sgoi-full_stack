@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ShoppingCart, Search, User } from "lucide-react";
+import UserMenu, { NavUser } from "@/components/(auth)/userMenu";
 
 const NAV_LINKS = [
   { label: "Home", href: "/" },
@@ -40,7 +41,11 @@ function NavLink({ href, label, isActive }: NavLinkProps) {
   );
 }
 
-function NavIcons() {
+interface NavIconsProps {
+  user: NavUser | null;
+}
+
+function NavIcons({ user }: NavIconsProps) {
   return (
     <div className="flex items-center gap-4 sm:gap-5">
       <button
@@ -55,17 +60,26 @@ function NavIcons() {
       >
         <ShoppingCart size={20} strokeWidth={1.75} />
       </button>
-      <button
-        aria-label="Account"
-        className="text-gray-700 hover:text-gray-900 transition-colors duration-200"
-      >
-        <User size={20} strokeWidth={1.75} />
-      </button>
+      {user ? (
+        <UserMenu user={user} />
+      ) : (
+        <Link
+          href="/auth"
+          aria-label="Account"
+          className="text-gray-700 hover:text-gray-900 transition-colors duration-200"
+        >
+          <User size={20} strokeWidth={1.75} />
+        </Link>
+      )}
     </div>
   );
 }
 
-export default function Navbar() {
+interface NavbarProps {
+  user?: NavUser | null;
+}
+
+export default function Navbar({ user = null }: NavbarProps) {
   const pathname = usePathname();
 
   return (
@@ -110,7 +124,7 @@ export default function Navbar() {
           ))}
         </ul>
 
-        <NavIcons />
+        <NavIcons user={user} />
       </nav>
     </header>
   );

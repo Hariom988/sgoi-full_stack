@@ -10,6 +10,10 @@ const geistSans = Geist({
 export const metadata: Metadata = {
   title: { default: "SGOI Pvt Ltd.", template: "%s | SGOI Pvt Ltd." },
   description: "Sign in or create an account with SGOI Pvt Ltd.",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default function AuthLayout({

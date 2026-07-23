@@ -24,6 +24,7 @@ export interface ValidUserSession {
   session: IUserSession;
   name: string;
   email: string;
+  avatarUrl: string | null;
 }
 
 export async function createUserSession(
@@ -70,7 +71,7 @@ export async function validateAndRefreshUserSession(
     if (!session) return null;
 
     const user = await User.findById(session.userId)
-      .select("name email")
+      .select("name email avatarUrl")
       .lean();
 
     if (!user) return null;
@@ -95,6 +96,7 @@ export async function validateAndRefreshUserSession(
       userId: session.userId.toString(),
       name: (user as { name?: string }).name ?? "",
       email: (user as { email?: string }).email ?? "",
+      avatarUrl: (user as { avatarUrl?: string | null }).avatarUrl ?? null,
       session,
     };
   } catch {

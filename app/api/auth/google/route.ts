@@ -21,7 +21,8 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
     return response;
   } catch (err) {
     console.error("[Google OAuth Init Error]", err);
-    const loginUrl = new URL("/login", request.url);
+    const loginUrl = new URL("/auth", request.url);
+    loginUrl.searchParams.set("mode", "login");
     loginUrl.searchParams.set("error", "google_unavailable");
     return NextResponse.redirect(loginUrl);
   }

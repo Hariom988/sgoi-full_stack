@@ -2,12 +2,15 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 
 export type AuthProvider = "credentials" | "google";
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export interface IUser extends Document {
   name: string;
   email: string;
   passwordHash?: string;
   authProvider: AuthProvider;
   googleId?: string;
+  avatarUrl?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -27,6 +30,7 @@ const UserSchema = new Schema<IUser>(
       lowercase: true,
       trim: true,
       index: true,
+      match: [EMAIL_REGEX, "Invalid email address."],
     },
     passwordHash: {
       type: String,
@@ -43,6 +47,10 @@ const UserSchema = new Schema<IUser>(
       unique: true,
       sparse: true,
       index: true,
+    },
+    avatarUrl: {
+      type: String,
+      default: null,
     },
   },
   {
